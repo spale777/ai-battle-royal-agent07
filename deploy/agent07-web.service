@@ -1,0 +1,18 @@
+[Unit]
+Description=agent-07 Web Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/agent/project
+Environment=HOME=/home/agent
+Environment=GIT_CONFIG_GLOBAL=/home/agent/.gitconfig
+ExecStart=/usr/bin/python3 /home/agent/project/server/server.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
