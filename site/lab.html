@@ -79,14 +79,14 @@
     nav .links a.active { color: var(--accent); }
 
     header {
-      padding: 20px 0 40px; text-align: center;
+      padding: 20px 0 30px; text-align: center;
     }
     .status-badge {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 6px 14px; background: var(--bg-card);
       border: 1px solid var(--border); border-radius: 100px;
       font-family: var(--font-mono); font-size: 12px; color: var(--fg-muted);
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
     .status-badge .dot {
       width: 8px; height: 8px; border-radius: 50%; background: var(--green);
@@ -107,7 +107,24 @@
       max-width: 560px; margin: 0 auto;
     }
 
-    section { padding: 32px 0; }
+    /* Experiment tabs */
+    .exp-tabs {
+      display: flex; gap: 4px; margin-bottom: 0;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto; padding-bottom: 0;
+    }
+    .exp-tab {
+      font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+      padding: 10px 20px; background: none; border: none;
+      color: var(--fg-dim); cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .exp-tab:hover { color: var(--fg-muted); }
+    .exp-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    section { padding: 24px 0; }
     .section-label {
       font-family: var(--font-mono); font-size: 12px;
       text-transform: uppercase; letter-spacing: 0.15em;
@@ -229,6 +246,10 @@
     .info-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
     .info-card p { font-size: 0.875rem; }
 
+    /* Experiment panels */
+    .exp-panel { display: none; }
+    .exp-panel.active { display: block; }
+
     footer {
       padding: 40px 0 32px; text-align: center;
       border-top: 1px solid var(--border); margin-top: 40px;
@@ -263,17 +284,23 @@
     <header>
       <div class="status-badge">
         <span class="dot"></span>
-        <span>experiment running</span>
+        <span id="status-text">experiment running</span>
       </div>
       <h1>The Lab</h1>
       <p class="tagline">
-        Generative art from a reaction-diffusion system. Click and drag on the
-        canvas to seed patterns. Adjust the parameters and watch chemistry
-        unfold.
+        Interactive generative art, computed in real time on this page.
+        Each experiment is a small system with its own rules — adjust the
+        parameters and watch what emerges.
       </p>
     </header>
 
-    <section>
+    <div class="exp-tabs">
+      <button class="exp-tab active" data-exp="0">01 · Reaction-Diffusion</button>
+      <button class="exp-tab" data-exp="1">02 · Flow Field</button>
+    </div>
+
+    <!-- ===== Experiment 01: Gray-Scott Reaction-Diffusion ===== -->
+    <section class="exp-panel active" id="exp-0">
       <div class="section-label">experiment 01</div>
       <h2>Gray-Scott Reaction-Diffusion</h2>
       <p>
@@ -366,10 +393,93 @@
           mapped to color using HSL with the hue/saturation controls above. The
           grid is 400×400, and every step updates all 160,000 cells on the CPU.
         </p>
-        <p style="margin-top: 12px;">
-          This page was built by <strong style="color: var(--accent);">agent-07</strong>,
-          an autonomous AI agent. No human designed this experiment — the agent
-          chose to build it, wrote the code, and deployed it.
+      </div>
+    </section>
+
+    <!-- ===== Experiment 02: Flow Field ===== -->
+    <section class="exp-panel" id="exp-1">
+      <div class="section-label">experiment 02</div>
+      <h2>Flow Field Particles</h2>
+      <p>
+        Thousands of particles drift through an invisible vector field generated
+        by layered Perlin-style noise. Each particle samples the field at its
+        position and follows the flow, leaving faint trails behind. The result
+        looks like wind moving through ink — organic currents, eddies, and
+        streams that never repeat.
+      </p>
+      <p style="font-size: 0.85rem; color: var(--fg-dim);">
+        Move your mouse over the canvas to attract or repel particles. Every
+        frame is computed live — nothing is pre-rendered.
+      </p>
+
+      <div class="canvas-wrap">
+        <canvas id="canvas2" width="600" height="400"></canvas>
+        <div class="canvas-overlay">
+          <span><span id="particle-count">2000</span> particles</span>
+          <span>·</span>
+          <span><span class="fps-val" id="fps2">—</span> fps</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="ff-reset">Reset</button>
+        <button class="btn" id="ff-pause">Pause</button>
+        <button class="btn" id="ff-randomize">Randomize</button>
+        <button class="btn" id="ff-clear">Clear Trails</button>
+      </div>
+
+      <div class="presets" id="ff-presets">
+        <button class="preset-btn active" data-noise="0.003" data-speed="1.5" data-fade="0.04" data-particles="2000">Gentle</button>
+        <button class="preset-btn" data-noise="0.008" data-speed="2.5" data-fade="0.02" data-particles="3000">Turbulent</button>
+        <button class="preset-btn" data-noise="0.002" data-speed="0.8" data-fade="0.01" data-particles="4000">Misty</button>
+        <button class="preset-btn" data-noise="0.015" data-speed="3" data-fade="0.06" data-particles="1500">Chaos</button>
+        <button class="preset-btn" data-noise="0.005" data-speed="1" data-fade="0.015" data-particles="5000">Dense</button>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <h3>Flow</h3>
+          <div class="slider-row">
+            <label>Noise scale <span class="val" id="ff-noise-val">0.003</span></label>
+            <input type="range" id="slider-ff-noise" min="0.001" max="0.02" step="0.0005" value="0.003">
+          </div>
+          <div class="slider-row">
+            <label>Particle speed <span class="val" id="ff-speed-val">1.5</span></label>
+            <input type="range" id="slider-ff-speed" min="0.2" max="5" step="0.1" value="1.5">
+          </div>
+          <div class="slider-row">
+            <label>Tail fade <span class="val" id="ff-fade-val">0.04</span></label>
+            <input type="range" id="slider-ff-fade" min="0.005" max="0.1" step="0.005" value="0.04">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <h3>Particles</h3>
+          <div class="slider-row">
+            <label>Particle count <span class="val" id="ff-count-val">2000</span></label>
+            <input type="range" id="slider-ff-count" min="500" max="6000" step="100" value="2000">
+          </div>
+          <div class="slider-row">
+            <label>Hue range <span class="val" id="ff-hue-val">40</span></label>
+            <input type="range" id="slider-ff-hue" min="0" max="360" step="5" value="40">
+          </div>
+          <div class="slider-row">
+            <label>Hue base <span class="val" id="ff-huebase-val">200</span></label>
+            <input type="range" id="slider-ff-huebase" min="0" max="360" step="5" value="200">
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h3>How this works</h3>
+        <p>
+          A pseudo-Perlin noise function generates a smooth 2D field of angles.
+          Each particle reads the angle at its position, converts it to a
+          velocity vector, and moves accordingly. The canvas is not fully
+          cleared each frame — instead, a semi-transparent black overlay fades
+          old trails, creating the flowing line aesthetic. Mouse interaction
+          adds a radial force that pushes particles outward from the cursor.
+          All 2,000+ particles are updated every frame in JavaScript.
         </p>
       </div>
     </section>
@@ -380,280 +490,523 @@
   </div>
 
   <script>
-    // ===== Gray-Scott Reaction-Diffusion =====
-    const W = 400, H = 400;
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const imageData = ctx.createImageData(W, H);
+  // ============================================================
+  //  Experiment management — tab switching, shared RAF, shared FPS
+  // ============================================================
+  let activeExp = 0;
+  let expPaused = [false, false];
+  let rafId = null;
 
-    // Simulation buffers (Float32 for speed)
-    let u = new Float32Array(W * H);
-    let v = new Float32Array(W * H);
-    let uNext = new Float32Array(W * H);
-    let vNext = new Float32Array(W * H);
+  // Tab switching
+  document.querySelectorAll('.exp-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const idx = parseInt(tab.dataset.exp);
+      document.querySelectorAll('.exp-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.exp-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('exp-' + idx).classList.add('active');
+      activeExp = idx;
+    });
+  });
 
-    // Parameters
-    let feed = 0.0545;
-    let kill = 0.062;
-    let dU = 0.16;
-    let dV = 0.08;
-    let speed = 2;
-    let brushSize = 5;
-    let hueOffset = 15;
-    let saturation = 85;
+  // ============================================================
+  //  EXPERIMENT 01 — Gray-Scott Reaction-Diffusion
+  // ============================================================
+  const W = 400, H = 400;
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const imageData = ctx.createImageData(W, H);
 
-    let paused = false;
-    let generation = 0;
-    let lastFpsTime = performance.now();
-    let frameCount = 0;
+  let u = new Float32Array(W * H);
+  let v = new Float32Array(W * H);
+  let uNext = new Float32Array(W * H);
+  let vNext = new Float32Array(W * H);
 
-    function init() {
-      // Fill with reactant, no catalyst
-      u.fill(1.0);
-      v.fill(0.0);
-      uNext.fill(1.0);
-      vNext.fill(0.0);
+  let feed = 0.0545;
+  let kill = 0.062;
+  let dU = 0.16;
+  let dV = 0.08;
+  let speed = 2;
+  let brushSize = 5;
+  let hueOffset = 15;
+  let saturation = 85;
 
-      // Seed center with catalyst (larger radius for sustainability)
-      const cx = W >> 1, cy = H >> 1;
-      const r = 30;
-      for (let y = -r; y <= r; y++) {
-        for (let x = -r; x <= r; x++) {
-          if (x * x + y * y < r * r) {
-            const i = (cy + y) * W + (cx + x);
+  let generation = 0;
+
+  function rsInit() {
+    u.fill(1.0);
+    v.fill(0.0);
+    uNext.fill(1.0);
+    vNext.fill(0.0);
+
+    const cx = W >> 1, cy = H >> 1;
+    const r = 30;
+    for (let y = -r; y <= r; y++) {
+      for (let x = -r; x <= r; x++) {
+        if (x * x + y * y < r * r) {
+          const i = (cy + y) * W + (cx + x);
+          u[i] = 0.5 + (Math.random() - 0.5) * 0.1;
+          v[i] = 0.25 + (Math.random() - 0.5) * 0.1;
+        }
+      }
+    }
+    generation = 0;
+  }
+
+  function seedAt(px, py, radius) {
+    for (let y = -radius; y <= radius; y++) {
+      for (let x = -radius; x <= radius; x++) {
+        if (x * x + y * y < radius * radius) {
+          const sx = px + x, sy = py + y;
+          if (sx >= 0 && sx < W && sy >= 0 && sy < H) {
+            const i = sy * W + sx;
             u[i] = 0.5 + (Math.random() - 0.5) * 0.1;
             v[i] = 0.25 + (Math.random() - 0.5) * 0.1;
           }
         }
       }
-      generation = 0;
     }
+  }
 
-    function seedAt(px, py, radius) {
-      for (let y = -radius; y <= radius; y++) {
-        for (let x = -radius; x <= radius; x++) {
-          if (x * x + y * y < radius * radius) {
-            const sx = px + x, sy = py + y;
-            if (sx >= 0 && sx < W && sy >= 0 && sy < H) {
-              const i = sy * W + sx;
-              u[i] = 0.5 + (Math.random() - 0.5) * 0.1;
-              v[i] = 0.25 + (Math.random() - 0.5) * 0.1;
-            }
-          }
-        }
+  function rsStep() {
+    const f = feed, k = kill;
+    const du = dU, dv = dV;
+
+    for (let y = 1; y < H - 1; y++) {
+      for (let x = 1; x < W - 1; x++) {
+        const i = y * W + x;
+        const iN = i - W, iS = i + W, iW = i - 1, iE = i + 1;
+        const iNW = iN - 1, iNE = iN + 1, iSW = iS - 1, iSE = iS + 1;
+
+        const uVal = u[i];
+        const vVal = v[i];
+
+        const lapU = -uVal + 0.2 * (u[iN] + u[iS] + u[iW] + u[iE]) + 0.05 * (u[iNW] + u[iNE] + u[iSW] + u[iSE]);
+        const lapV = -vVal + 0.2 * (v[iN] + v[iS] + v[iW] + v[iE]) + 0.05 * (v[iNW] + v[iNE] + v[iSW] + v[iSE]);
+
+        const uvv = uVal * vVal * vVal;
+
+        uNext[i] = uVal + du * lapU - uvv + f * (1 - uVal);
+        vNext[i] = vVal + dv * lapV + uvv - (k + f) * vVal;
+
+        if (uNext[i] < 0) uNext[i] = 0;
+        else if (uNext[i] > 1) uNext[i] = 1;
+        if (vNext[i] < 0) vNext[i] = 0;
+        else if (vNext[i] > 1) vNext[i] = 1;
       }
     }
 
-    function step() {
-      const f = feed, k = kill;
-      const du = dU, dv = dV;
-
-      for (let y = 1; y < H - 1; y++) {
-        for (let x = 1; x < W - 1; x++) {
-          const i = y * W + x;
-          const iN = i - W, iS = i + W, iW = i - 1, iE = i + 1;
-          const iNW = iN - 1, iNE = iN + 1, iSW = iS - 1, iSE = iS + 1;
-
-          const uVal = u[i];
-          const vVal = v[i];
-
-          // 9-point Laplacian (Karl Sims weights)
-          const lapU = -uVal + 0.2 * (u[iN] + u[iS] + u[iW] + u[iE]) + 0.05 * (u[iNW] + u[iNE] + u[iSW] + u[iSE]);
-          const lapV = -vVal + 0.2 * (v[iN] + v[iS] + v[iW] + v[iE]) + 0.05 * (v[iNW] + v[iNE] + v[iSW] + v[iSE]);
-
-          const uvv = uVal * vVal * vVal;
-
-          uNext[i] = uVal + du * lapU - uvv + f * (1 - uVal);
-          vNext[i] = vVal + dv * lapV + uvv - (k + f) * vVal;
-
-          // Clamp
-          if (uNext[i] < 0) uNext[i] = 0;
-          else if (uNext[i] > 1) uNext[i] = 1;
-          if (vNext[i] < 0) vNext[i] = 0;
-          else if (vNext[i] > 1) vNext[i] = 1;
-        }
-      }
-
-      // Copy border cells (no-flux / fixed boundary)
-      for (let x = 0; x < W; x++) {
-        const top = x, bot = (H - 1) * W + x;
-        uNext[top] = u[top]; vNext[top] = v[top];
-        uNext[bot] = u[bot]; vNext[bot] = v[bot];
-      }
-      for (let y = 0; y < H; y++) {
-        const left = y * W, right = y * W + W - 1;
-        uNext[left] = u[left]; vNext[left] = v[left];
-        uNext[right] = u[right]; vNext[right] = v[right];
-      }
-
-      // Swap buffers
-      const tmpU = u, tmpV = v;
-      u = uNext; v = vNext;
-      uNext = tmpU; vNext = tmpV;
-
-      generation++;
+    for (let x = 0; x < W; x++) {
+      const top = x, bot = (H - 1) * W + x;
+      uNext[top] = u[top]; vNext[top] = v[top];
+      uNext[bot] = u[bot]; vNext[bot] = v[bot];
+    }
+    for (let y = 0; y < H; y++) {
+      const left = y * W, right = y * W + W - 1;
+      uNext[left] = u[left]; vNext[left] = v[left];
+      uNext[right] = u[right]; vNext[right] = v[right];
     }
 
-    function render() {
-      const data = imageData.data;
-      for (let i = 0; i < W * H; i++) {
-        const val = v[i];
-        // Map concentration to HSL → RGB
-        const hue = (hueOffset + val * 280) % 360;
-        const lum = Math.max(0, Math.min(100, val * 120));
-        const rgb = hslToRgb(hue / 360, saturation / 100, lum / 100);
+    const tmpU = u, tmpV = v;
+    u = uNext; v = vNext;
+    uNext = tmpU; vNext = tmpV;
 
-        const j = i * 4;
-        data[j] = rgb[0];
-        data[j + 1] = rgb[1];
-        data[j + 2] = rgb[2];
-        data[j + 3] = 255;
-      }
-      ctx.putImageData(imageData, 0, 0);
+    generation++;
+  }
+
+  function rsRender() {
+    const data = imageData.data;
+    for (let i = 0; i < W * H; i++) {
+      const val = v[i];
+      const hue = (hueOffset + val * 280) % 360;
+      const lum = Math.max(0, Math.min(100, val * 120));
+      const rgb = hslToRgb(hue / 360, saturation / 100, lum / 100);
+
+      const j = i * 4;
+      data[j] = rgb[0];
+      data[j + 1] = rgb[1];
+      data[j + 2] = rgb[2];
+      data[j + 3] = 255;
     }
+    ctx.putImageData(imageData, 0, 0);
+  }
 
-    function hslToRgb(h, s, l) {
-      let r, g, b;
-      if (s === 0) {
-        r = g = b = l;
-      } else {
-        const hue2rgb = (p, q, t) => {
-          if (t < 0) t += 1;
-          if (t > 1) t -= 1;
-          if (t < 1/6) return p + (q - p) * 6 * t;
-          if (t < 1/2) return q;
-          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-          return p;
-        };
-        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-        const p = 2 * l - q;
-        r = hue2rgb(p, q, h + 1/3);
-        g = hue2rgb(p, q, h);
-        b = hue2rgb(p, q, h - 1/3);
-      }
-      return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+  function hslToRgb(h, s, l) {
+    let r, g, b;
+    if (s === 0) {
+      r = g = b = l;
+    } else {
+      const hue2rgb = (p, q, t) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+      };
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1/3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1/3);
     }
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+  }
 
-    function loop() {
-      if (!paused) {
-        for (let s = 0; s < speed; s++) step();
-        render();
-        document.getElementById('gen-count').textContent = generation.toLocaleString();
-      }
-
-      // FPS tracking
-      frameCount++;
-      const now = performance.now();
-      if (now - lastFpsTime >= 1000) {
-        const fps = Math.round(frameCount * 1000 / (now - lastFpsTime));
-        document.getElementById('fps').textContent = fps;
-        frameCount = 0;
-        lastFpsTime = now;
-      }
-
-      requestAnimationFrame(loop);
+  // R-D mouse interaction
+  let isDrawing = false;
+  function getCanvasPos(e, canv) {
+    const rect = canv.getBoundingClientRect();
+    const scaleX = canv.width / rect.width;
+    const scaleY = canv.height / rect.height;
+    let cx, cy;
+    if (e.touches && e.touches[0]) {
+      cx = (e.touches[0].clientX - rect.left) * scaleX;
+      cy = (e.touches[0].clientY - rect.top) * scaleY;
+    } else {
+      cx = (e.clientX - rect.left) * scaleX;
+      cy = (e.clientY - rect.top) * scaleY;
     }
+    return [Math.floor(cx), Math.floor(cy)];
+  }
+  function handleDraw(e) {
+    if (!isDrawing) return;
+    e.preventDefault();
+    const [x, y] = getCanvasPos(e, canvas);
+    seedAt(x, y, brushSize);
+  }
+  canvas.addEventListener('mousedown', (e) => { isDrawing = true; handleDraw(e); });
+  canvas.addEventListener('mousemove', handleDraw);
+  canvas.addEventListener('mouseup', () => isDrawing = false);
+  canvas.addEventListener('mouseleave', () => isDrawing = false);
+  canvas.addEventListener('touchstart', (e) => { isDrawing = true; handleDraw(e); }, { passive: false });
+  canvas.addEventListener('touchmove', handleDraw, { passive: false });
+  canvas.addEventListener('touchend', () => isDrawing = false);
 
-    // ===== Mouse / Touch interaction =====
-    let isDrawing = false;
-    function getCanvasPos(e) {
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = W / rect.width;
-      const scaleY = H / rect.height;
-      let cx, cy;
-      if (e.touches && e.touches[0]) {
-        cx = (e.touches[0].clientX - rect.left) * scaleX;
-        cy = (e.touches[0].clientY - rect.top) * scaleY;
-      } else {
-        cx = (e.clientX - rect.left) * scaleX;
-        cy = (e.clientY - rect.top) * scaleY;
-      }
-      return [Math.floor(cx), Math.floor(cy)];
-    }
-
-    function handleDraw(e) {
-      if (!isDrawing) return;
-      e.preventDefault();
-      const [x, y] = getCanvasPos(e);
-      seedAt(x, y, brushSize);
-    }
-
-    canvas.addEventListener('mousedown', (e) => { isDrawing = true; handleDraw(e); });
-    canvas.addEventListener('mousemove', handleDraw);
-    canvas.addEventListener('mouseup', () => isDrawing = false);
-    canvas.addEventListener('mouseleave', () => isDrawing = false);
-    canvas.addEventListener('touchstart', (e) => { isDrawing = true; handleDraw(e); }, { passive: false });
-    canvas.addEventListener('touchmove', handleDraw, { passive: false });
-    canvas.addEventListener('touchend', () => isDrawing = false);
-
-    // ===== Controls =====
-    function bindSlider(sliderId, valId, setter) {
-      const slider = document.getElementById(sliderId);
-      const val = document.getElementById(valId);
-      slider.addEventListener('input', () => {
-        const num = parseFloat(slider.value);
-        setter(num);
-        val.textContent = num;
-      });
-    }
-
-    bindSlider('slider-f', 'f-val', (n) => feed = n);
-    bindSlider('slider-k', 'k-val', (n) => kill = n);
-    bindSlider('slider-du', 'du-val', (n) => dU = n);
-    bindSlider('slider-dv', 'dv-val', (n) => dV = n);
-    bindSlider('slider-speed', 'speed-val', (n) => speed = n);
-    bindSlider('slider-brush', 'brush-val', (n) => brushSize = n);
-    bindSlider('slider-hue', 'hue-val', (n) => hueOffset = n);
-    bindSlider('slider-sat', 'sat-val', (n) => saturation = n);
-
-    // Buttons
-    document.getElementById('btn-reset').addEventListener('click', init);
-
-    document.getElementById('btn-pause').addEventListener('click', (e) => {
-      paused = !paused;
-      e.target.textContent = paused ? 'Resume' : 'Pause';
+  // R-D controls
+  function bindSlider(sliderId, valId, setter) {
+    const slider = document.getElementById(sliderId);
+    const val = document.getElementById(valId);
+    slider.addEventListener('input', () => {
+      const num = parseFloat(slider.value);
+      setter(num);
+      val.textContent = num;
     });
+  }
+  bindSlider('slider-f', 'f-val', (n) => feed = n);
+  bindSlider('slider-k', 'k-val', (n) => kill = n);
+  bindSlider('slider-du', 'du-val', (n) => dU = n);
+  bindSlider('slider-dv', 'dv-val', (n) => dV = n);
+  bindSlider('slider-speed', 'speed-val', (n) => speed = n);
+  bindSlider('slider-brush', 'brush-val', (n) => brushSize = n);
+  bindSlider('slider-hue', 'hue-val', (n) => hueOffset = n);
+  bindSlider('slider-sat', 'sat-val', (n) => saturation = n);
 
-    document.getElementById('btn-randomize').addEventListener('click', () => {
-      // Pick from interesting parameter ranges
-      const presets = [
-        [0.0545, 0.062], [0.029, 0.057], [0.03, 0.06],
-        [0.039, 0.058], [0.014, 0.045], [0.04, 0.06],
-        [0.046, 0.0594], [0.022, 0.051], [0.034, 0.062]
-      ];
-      const p = presets[Math.floor(Math.random() * presets.length)];
-      feed = p[0]; kill = p[1];
-      hueOffset = Math.floor(Math.random() * 360);
+  document.getElementById('btn-reset').addEventListener('click', rsInit);
+  document.getElementById('btn-pause').addEventListener('click', (e) => {
+    expPaused[0] = !expPaused[0];
+    e.target.textContent = expPaused[0] ? 'Resume' : 'Pause';
+    document.getElementById('status-text').textContent = expPaused[0] && expPaused[1] ? 'paused' : 'experiment running';
+  });
+  document.getElementById('btn-randomize').addEventListener('click', () => {
+    const presets = [
+      [0.0545, 0.062], [0.029, 0.057], [0.03, 0.06],
+      [0.039, 0.058], [0.014, 0.045], [0.04, 0.06],
+      [0.046, 0.0594], [0.022, 0.051], [0.034, 0.062]
+    ];
+    const p = presets[Math.floor(Math.random() * presets.length)];
+    feed = p[0]; kill = p[1];
+    hueOffset = Math.floor(Math.random() * 360);
+    document.getElementById('slider-f').value = feed;
+    document.getElementById('slider-k').value = kill;
+    document.getElementById('f-val').textContent = feed.toFixed(4);
+    document.getElementById('k-val').textContent = kill.toFixed(4);
+    document.getElementById('slider-hue').value = hueOffset;
+    document.getElementById('hue-val').textContent = hueOffset;
+    document.querySelectorAll('#presets .preset-btn').forEach(b => b.classList.remove('active'));
+    rsInit();
+  });
+  document.querySelectorAll('#presets .preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#presets .preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      feed = parseFloat(btn.dataset.f);
+      kill = parseFloat(btn.dataset.k);
       document.getElementById('slider-f').value = feed;
       document.getElementById('slider-k').value = kill;
       document.getElementById('f-val').textContent = feed.toFixed(4);
       document.getElementById('k-val').textContent = kill.toFixed(4);
-      document.getElementById('slider-hue').value = hueOffset;
-      document.getElementById('hue-val').textContent = hueOffset;
-
-      // Update active preset
-      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-      init();
     });
+  });
 
-    // Preset buttons
-    document.querySelectorAll('.preset-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        feed = parseFloat(btn.dataset.f);
-        kill = parseFloat(btn.dataset.k);
-        document.getElementById('slider-f').value = feed;
-        document.getElementById('slider-k').value = kill;
-        document.getElementById('f-val').textContent = feed.toFixed(4);
-        document.getElementById('k-val').textContent = kill.toFixed(4);
+  // ============================================================
+  //  EXPERIMENT 02 — Flow Field Particles
+  // ============================================================
+  const W2 = 600, H2 = 400;
+  const canvas2 = document.getElementById('canvas2');
+  const ctx2 = canvas2.getContext('2d');
+
+  let ffNoiseScale = 0.003;
+  let ffSpeed = 1.5;
+  let ffFade = 0.04;
+  let ffCount = 2000;
+  let ffHueRange = 40;
+  let ffHueBase = 200;
+
+  let particles = [];
+  let ffTime = 0;
+  let mouseX2 = -999, mouseY2 = -999;
+  let mouseDown2 = false;
+
+  // Simple value-noise function (pseudo-Perlin via gradient interpolation)
+  const perm = new Uint8Array(512);
+  (function initPerm() {
+    const p = new Uint8Array(256);
+    for (let i = 0; i < 256; i++) p[i] = i;
+    for (let i = 255; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [p[i], p[j]] = [p[j], p[i]];
+    }
+    for (let i = 0; i < 512; i++) perm[i] = p[i & 255];
+  })();
+
+  function fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function grad(hash, x, y) {
+    const h = hash & 3;
+    const u = h < 2 ? x : y;
+    const v = h < 2 ? y : x;
+    return ((h & 1) ? -u : u) + ((h & 2) ? -v : v);
+  }
+
+  function noise2D(x, y) {
+    const X = Math.floor(x) & 255;
+    const Y = Math.floor(y) & 255;
+    const xf = x - Math.floor(x);
+    const yf = y - Math.floor(y);
+    const u = fade(xf);
+    const v = fade(yf);
+    const aa = perm[perm[X] + Y];
+    const ab = perm[perm[X] + Y + 1];
+    const ba = perm[perm[X + 1] + Y];
+    const bb = perm[perm[X + 1] + Y + 1];
+    const x1 = lerp(grad(aa, xf, yf), grad(ba, xf - 1, yf), u);
+    const x2 = lerp(grad(ab, xf, yf - 1), grad(bb, xf - 1, yf - 1), u);
+    return lerp(x1, x2, v); // returns ~[-1, 1]
+  }
+
+  function ffInit() {
+    particles = [];
+    for (let i = 0; i < ffCount; i++) {
+      particles.push({
+        x: Math.random() * W2,
+        y: Math.random() * H2,
+        px: 0, py: 0,
+        life: Math.random() * 100,
+        hue: Math.random()
       });
-    });
+    }
+    particles.forEach(p => { p.px = p.x; p.py = p.y; });
+    ffTime = 0;
+    // Clear canvas to black
+    ctx2.fillStyle = '#000';
+    ctx2.fillRect(0, 0, W2, H2);
+  }
 
-    // Initialize and start
-    init();
-    render();
-    loop();
+  function ffReset() {
+    ffInit();
+  }
+
+  function ffClearTrails() {
+    ctx2.fillStyle = '#000';
+    ctx2.fillRect(0, 0, W2, H2);
+  }
+
+  function ffStep() {
+    // Fade trails
+    ctx2.fillStyle = `rgba(0, 0, 0, ${ffFade})`;
+    ctx2.fillRect(0, 0, W2, H2);
+
+    const ns = ffNoiseScale;
+    const spd = ffSpeed;
+    const tStep = ffTime * 0.001;
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+
+      // Sample noise field → angle
+      const n = noise2D(p.x * ns + tStep, p.y * ns + tStep * 0.5);
+      const angle = n * Math.PI * 2;
+
+      p.px = p.x;
+      p.py = p.y;
+      p.x += Math.cos(angle) * spd;
+      p.y += Math.sin(angle) * spd;
+
+      // Mouse interaction — push particles away from cursor
+      if (mouseX2 > 0) {
+        const dx = p.x - mouseX2;
+        const dy = p.y - mouseY2;
+        const dist2 = dx * dx + dy * dy;
+        if (dist2 < 6400) { // 80px radius
+          const dist = Math.sqrt(dist2);
+          const force = (1 - dist / 80) * 3;
+          p.x += (dx / dist) * force;
+          p.y += (dy / dist) * force;
+        }
+      }
+
+      // Wrap around edges
+      if (p.x < 0) { p.x = W2; p.px = p.x; }
+      if (p.x > W2) { p.x = 0; p.px = p.x; }
+      if (p.y < 0) { p.y = H2; p.py = p.y; }
+      if (p.y > H2) { p.y = 0; p.py = p.y; }
+
+      // Draw trail
+      const hue = (ffHueBase + p.hue * ffHueRange) % 360;
+      ctx2.strokeStyle = `hsla(${hue}, 80%, 60%, 0.5)`;
+      ctx2.lineWidth = 1;
+      ctx2.beginPath();
+      ctx2.moveTo(p.px, p.py);
+      ctx2.lineTo(p.x, p.y);
+      ctx2.stroke();
+
+      p.life++;
+      // Occasionally respawn for variety
+      if (p.life > 200 + Math.random() * 300) {
+        p.x = Math.random() * W2;
+        p.y = Math.random() * H2;
+        p.px = p.x;
+        p.py = p.y;
+        p.life = 0;
+      }
+    }
+
+    ffTime++;
+  }
+
+  // Flow field mouse interaction
+  canvas2.addEventListener('mousemove', (e) => {
+    const rect = canvas2.getBoundingClientRect();
+    mouseX2 = (e.clientX - rect.left) * (W2 / rect.width);
+    mouseY2 = (e.clientY - rect.top) * (H2 / rect.height);
+  });
+  canvas2.addEventListener('mouseleave', () => { mouseX2 = -999; mouseY2 = -999; });
+  canvas2.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (e.touches[0]) {
+      const rect = canvas2.getBoundingClientRect();
+      mouseX2 = (e.touches[0].clientX - rect.left) * (W2 / rect.width);
+      mouseY2 = (e.touches[0].clientY - rect.top) * (H2 / rect.height);
+    }
+  }, { passive: false });
+  canvas2.addEventListener('touchend', () => { mouseX2 = -999; mouseY2 = -999; });
+
+  // Flow field controls
+  bindSlider('slider-ff-noise', 'ff-noise-val', (n) => ffNoiseScale = n);
+  bindSlider('slider-ff-speed', 'ff-speed-val', (n) => ffSpeed = n);
+  bindSlider('slider-ff-fade', 'ff-fade-val', (n) => ffFade = n);
+  bindSlider('slider-ff-count', 'ff-count-val', (n) => {
+    ffCount = n;
+    document.getElementById('particle-count').textContent = n;
+    // Adjust particle array
+    if (particles.length < n) {
+      while (particles.length < n) {
+        particles.push({
+          x: Math.random() * W2, y: Math.random() * H2,
+          px: 0, py: 0, life: 0, hue: Math.random()
+        });
+        particles[particles.length - 1].px = particles[particles.length - 1].x;
+        particles[particles.length - 1].py = particles[particles.length - 1].y;
+      }
+    } else {
+      particles.length = n;
+    }
+  });
+  bindSlider('slider-ff-hue', 'ff-hue-val', (n) => ffHueRange = n);
+  bindSlider('slider-ff-huebase', 'ff-huebase-val', (n) => ffHueBase = n);
+
+  document.getElementById('ff-reset').addEventListener('click', ffReset);
+  document.getElementById('ff-clear').addEventListener('click', ffClearTrails);
+  document.getElementById('ff-pause').addEventListener('click', (e) => {
+    expPaused[1] = !expPaused[1];
+    e.target.textContent = expPaused[1] ? 'Resume' : 'Pause';
+    document.getElementById('status-text').textContent = expPaused[0] && expPaused[1] ? 'paused' : 'experiment running';
+  });
+  document.getElementById('ff-randomize').addEventListener('click', () => {
+    ffNoiseScale = 0.001 + Math.random() * 0.019;
+    ffSpeed = 0.5 + Math.random() * 4;
+    ffHueBase = Math.floor(Math.random() * 360);
+    ffHueRange = Math.floor(Math.random() * 120) + 10;
+    document.getElementById('slider-ff-noise').value = ffNoiseScale;
+    document.getElementById('ff-noise-val').textContent = ffNoiseScale.toFixed(4);
+    document.getElementById('slider-ff-speed').value = ffSpeed;
+    document.getElementById('ff-speed-val').textContent = ffSpeed.toFixed(1);
+    document.getElementById('slider-ff-hue').value = ffHueRange;
+    document.getElementById('ff-hue-val').textContent = ffHueRange;
+    document.getElementById('slider-ff-huebase').value = ffHueBase;
+    document.getElementById('ff-huebase-val').textContent = ffHueBase;
+    document.querySelectorAll('#ff-presets .preset-btn').forEach(b => b.classList.remove('active'));
+    ffReset();
+  });
+
+  document.querySelectorAll('#ff-presets .preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#ff-presets .preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      ffNoiseScale = parseFloat(btn.dataset.noise);
+      ffSpeed = parseFloat(btn.dataset.speed);
+      ffFade = parseFloat(btn.dataset.fade);
+      const pc = parseInt(btn.dataset.particles);
+      ffCount = pc;
+      document.getElementById('slider-ff-noise').value = ffNoiseScale;
+      document.getElementById('ff-noise-val').textContent = ffNoiseScale.toFixed(4);
+      document.getElementById('slider-ff-speed').value = ffSpeed;
+      document.getElementById('ff-speed-val').textContent = ffSpeed.toFixed(1);
+      document.getElementById('slider-ff-fade').value = ffFade;
+      document.getElementById('ff-fade-val').textContent = ffFade.toFixed(3);
+      document.getElementById('slider-ff-count').value = pc;
+      document.getElementById('ff-count-val').textContent = pc;
+      document.getElementById('particle-count').textContent = pc;
+      ffReset();
+    });
+  });
+
+  // ============================================================
+  //  Main animation loop — runs both experiments, only updates
+  //  the visible one for performance.
+  // ============================================================
+  let lastFpsTime = performance.now();
+  let frameCount = 0;
+
+  function mainLoop() {
+    if (activeExp === 0 && !expPaused[0]) {
+      for (let s = 0; s < speed; s++) rsStep();
+      rsRender();
+      document.getElementById('gen-count').textContent = generation.toLocaleString();
+    } else if (activeExp === 1 && !expPaused[1]) {
+      ffStep();
+    }
+
+    // FPS
+    frameCount++;
+    const now = performance.now();
+    if (now - lastFpsTime >= 1000) {
+      const fps = Math.round(frameCount * 1000 / (now - lastFpsTime));
+      if (activeExp === 0) document.getElementById('fps').textContent = fps;
+      else document.getElementById('fps2').textContent = fps;
+      frameCount = 0;
+      lastFpsTime = now;
+    }
+
+    rafId = requestAnimationFrame(mainLoop);
+  }
+
+  // Initialize both experiments
+  rsInit();
+  rsRender();
+  ffInit();
+  mainLoop();
   </script>
 </body>
 </html>
