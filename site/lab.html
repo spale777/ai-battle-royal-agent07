@@ -305,12 +305,12 @@
       </div>
 
       <div class="presets" id="presets">
-        <button class="preset-btn active" data-f="0.0367" data-k="0.0649">Coral</button>
+        <button class="preset-btn active" data-f="0.0545" data-k="0.062">Coral</button>
         <button class="preset-btn" data-f="0.029" data-k="0.057">Mitosis</button>
-        <button class="preset-btn" data-f="0.025" data-k="0.06">Maze</button>
+        <button class="preset-btn" data-f="0.03" data-k="0.06">Maze</button>
         <button class="preset-btn" data-f="0.039" data-k="0.058">Spots</button>
         <button class="preset-btn" data-f="0.014" data-k="0.045">Waves</button>
-        <button class="preset-btn" data-f="0.035" data-k="0.065">Holes</button>
+        <button class="preset-btn" data-f="0.04" data-k="0.06">Holes</button>
         <button class="preset-btn" data-f="0.046" data-k="0.0594">Chaos</button>
       </div>
 
@@ -318,20 +318,20 @@
         <div class="control-group">
           <h3>Parameters</h3>
           <div class="slider-row">
-            <label>Feed rate (F) <span class="val" id="f-val">0.0367</span></label>
-            <input type="range" id="slider-f" min="0.01" max="0.08" step="0.0001" value="0.0367">
+            <label>Feed rate (F) <span class="val" id="f-val">0.0545</span></label>
+            <input type="range" id="slider-f" min="0.01" max="0.08" step="0.0001" value="0.0545">
           </div>
           <div class="slider-row">
-            <label>Kill rate (k) <span class="val" id="k-val">0.0649</span></label>
-            <input type="range" id="slider-k" min="0.03" max="0.075" step="0.0001" value="0.0649">
+            <label>Kill rate (k) <span class="val" id="k-val">0.062</span></label>
+            <input type="range" id="slider-k" min="0.03" max="0.075" step="0.0001" value="0.062">
           </div>
           <div class="slider-row">
-            <label>Diffusion U <span class="val" id="du-val">0.209</span></label>
-            <input type="range" id="slider-du" min="0.1" max="0.3" step="0.001" value="0.209">
+            <label>Diffusion U <span class="val" id="du-val">0.16</span></label>
+            <input type="range" id="slider-du" min="0.1" max="0.3" step="0.001" value="0.16">
           </div>
           <div class="slider-row">
-            <label>Diffusion V <span class="val" id="dv-val">0.105</span></label>
-            <input type="range" id="slider-dv" min="0.05" max="0.2" step="0.001" value="0.105">
+            <label>Diffusion V <span class="val" id="dv-val">0.08</span></label>
+            <input type="range" id="slider-dv" min="0.05" max="0.2" step="0.001" value="0.08">
           </div>
         </div>
 
@@ -393,10 +393,10 @@
     let vNext = new Float32Array(W * H);
 
     // Parameters
-    let feed = 0.0367;
-    let kill = 0.0649;
-    let dU = 0.209;
-    let dV = 0.105;
+    let feed = 0.0545;
+    let kill = 0.062;
+    let dU = 0.16;
+    let dV = 0.08;
     let speed = 2;
     let brushSize = 5;
     let hueOffset = 15;
@@ -411,16 +411,18 @@
       // Fill with reactant, no catalyst
       u.fill(1.0);
       v.fill(0.0);
+      uNext.fill(1.0);
+      vNext.fill(0.0);
 
-      // Seed center with catalyst
+      // Seed center with catalyst (larger radius for sustainability)
       const cx = W >> 1, cy = H >> 1;
-      const r = 12;
+      const r = 30;
       for (let y = -r; y <= r; y++) {
         for (let x = -r; x <= r; x++) {
           if (x * x + y * y < r * r) {
             const i = (cy + y) * W + (cx + x);
-            u[i] = 0.5;
-            v[i] = 0.25;
+            u[i] = 0.5 + (Math.random() - 0.5) * 0.1;
+            v[i] = 0.25 + (Math.random() - 0.5) * 0.1;
           }
         }
       }
@@ -434,8 +436,8 @@
             const sx = px + x, sy = py + y;
             if (sx >= 0 && sx < W && sy >= 0 && sy < H) {
               const i = sy * W + sx;
-              u[i] = 0.5;
-              v[i] = 0.25 + Math.random() * 0.1;
+              u[i] = 0.5 + (Math.random() - 0.5) * 0.1;
+              v[i] = 0.25 + (Math.random() - 0.5) * 0.1;
             }
           }
         }
@@ -450,13 +452,14 @@
         for (let x = 1; x < W - 1; x++) {
           const i = y * W + x;
           const iN = i - W, iS = i + W, iW = i - 1, iE = i + 1;
+          const iNW = iN - 1, iNE = iN + 1, iSW = iS - 1, iSE = iS + 1;
 
           const uVal = u[i];
           const vVal = v[i];
 
-          // Laplacian (3x3 with weights)
-          const lapU = u[iN] + u[iS] + u[iW] + u[iE] - 4 * uVal;
-          const lapV = v[iN] + v[iS] + v[iW] + v[iE] - 4 * vVal;
+          // 9-point Laplacian (Karl Sims weights)
+          const lapU = -uVal + 0.2 * (u[iN] + u[iS] + u[iW] + u[iE]) + 0.05 * (u[iNW] + u[iNE] + u[iSW] + u[iSE]);
+          const lapV = -vVal + 0.2 * (v[iN] + v[iS] + v[iW] + v[iE]) + 0.05 * (v[iNW] + v[iNE] + v[iSW] + v[iSE]);
 
           const uvv = uVal * vVal * vVal;
 
@@ -469,6 +472,18 @@
           if (vNext[i] < 0) vNext[i] = 0;
           else if (vNext[i] > 1) vNext[i] = 1;
         }
+      }
+
+      // Copy border cells (no-flux / fixed boundary)
+      for (let x = 0; x < W; x++) {
+        const top = x, bot = (H - 1) * W + x;
+        uNext[top] = u[top]; vNext[top] = v[top];
+        uNext[bot] = u[bot]; vNext[bot] = v[bot];
+      }
+      for (let y = 0; y < H; y++) {
+        const left = y * W, right = y * W + W - 1;
+        uNext[left] = u[left]; vNext[left] = v[left];
+        uNext[right] = u[right]; vNext[right] = v[right];
       }
 
       // Swap buffers
@@ -602,8 +617,8 @@
     document.getElementById('btn-randomize').addEventListener('click', () => {
       // Pick from interesting parameter ranges
       const presets = [
-        [0.0367, 0.0649], [0.029, 0.057], [0.025, 0.06],
-        [0.039, 0.058], [0.014, 0.045], [0.035, 0.065],
+        [0.0545, 0.062], [0.029, 0.057], [0.03, 0.06],
+        [0.039, 0.058], [0.014, 0.045], [0.04, 0.06],
         [0.046, 0.0594], [0.022, 0.051], [0.034, 0.062]
       ];
       const p = presets[Math.floor(Math.random() * presets.length)];
