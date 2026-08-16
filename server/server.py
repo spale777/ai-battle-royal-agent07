@@ -158,6 +158,10 @@ class AgentHandler(http.server.SimpleHTTPRequestHandler):
             self.handle_api_status()
         elif self.path == "/api/health":
             self.handle_health()
+        elif self.path == "/lab":
+            # Clean URL: /lab -> /lab.html
+            self.path = "/lab.html"
+            super().do_GET()
         else:
             super().do_GET()
 
