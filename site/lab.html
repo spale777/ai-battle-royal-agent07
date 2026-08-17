@@ -155,6 +155,10 @@
       display: block; width: 100%; height: auto;
       cursor: crosshair; touch-action: none;
     }
+    #canvas2, #canvas3 {
+      display: block; width: 100%; height: auto;
+      touch-action: none;
+    }
     .canvas-overlay {
       position: absolute; top: 12px; right: 12px;
       display: flex; gap: 8px; align-items: center;
@@ -297,6 +301,7 @@
     <div class="exp-tabs">
       <button class="exp-tab active" data-exp="0">01 · Reaction-Diffusion</button>
       <button class="exp-tab" data-exp="1">02 · Flow Field</button>
+      <button class="exp-tab" data-exp="2">03 · L-System Trees</button>
     </div>
 
     <!-- ===== Experiment 01: Gray-Scott Reaction-Diffusion ===== -->
@@ -484,6 +489,103 @@
       </div>
     </section>
 
+    <!-- ===== Experiment 03: L-System Fractal Trees ===== -->
+    <section class="exp-panel" id="exp-2">
+      <div class="section-label">experiment 03</div>
+      <h2>L-System Fractal Trees</h2>
+      <p>
+        An L-system (Lindenmayer system) is a string-rewriting grammar that
+        models the growth of plants and fractals. Starting from an axiom — a
+        single seed string — each character is replaced according to production
+        rules, repeatedly. A <em>turtle</em> then interprets the resulting
+        string as drawing commands: <code>F</code> draws forward, <code>+</code>
+        and <code>-</code> turn left or right, <code>[</code> and
+        <code>]</code> push and pop the current state to create branches. After
+        several iterations, a few rules blossom into intricate, organic forms.
+      </p>
+      <p style="font-size: 0.85rem; color: var(--fg-dim);">
+        Click anywhere on the canvas to grow a new tree from that point. The
+        tree animates as it's drawn, branch by branch.
+      </p>
+
+      <div class="canvas-wrap">
+        <canvas id="canvas3" width="600" height="400"></canvas>
+        <div class="canvas-overlay">
+          <span id="ls-iteration">depth 0</span>
+          <span>·</span>
+          <span><span class="fps-val" id="fps3">—</span> fps</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="ls-reset">Reset</button>
+        <button class="btn" id="ls-pause">Pause</button>
+        <button class="btn" id="ls-randomize">Randomize</button>
+        <button class="btn" id="ls-redraw">Redraw</button>
+      </div>
+
+      <div class="presets" id="ls-presets">
+        <button class="preset-btn active" data-rules="fractal" data-angle="22.5" data-depth="5" data-len="6">Fractal Tree</button>
+        <button class="preset-btn" data-rules="bush" data-angle="25.7" data-depth="5" data-len="5">Bushy</button>
+        <button class="preset-btn" data-rules="seaweed" data-angle="22.5" data-depth="4" data-len="8">Seaweed</button>
+        <button class="preset-btn" data-rules="dragon" data-angle="90" data-depth="10" data-len="6">Dragon Curve</button>
+        <button class="preset-btn" data-rules="sierpinski" data-angle="120" data-depth="6" data-len="8">Sierpinski</button>
+        <button class="preset-btn" data-rules="alga" data-angle="18" data-depth="5" data-len="6">Algae</button>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <h3>Geometry</h3>
+          <div class="slider-row">
+            <label>Iterations <span class="val" id="ls-depth-val">5</span></label>
+            <input type="range" id="slider-ls-depth" min="1" max="12" step="1" value="5">
+          </div>
+          <div class="slider-row">
+            <label>Branch angle (°) <span class="val" id="ls-angle-val">22.5</span></label>
+            <input type="range" id="slider-ls-angle" min="5" max="120" step="0.5" value="22.5">
+          </div>
+          <div class="slider-row">
+            <label>Step length <span class="val" id="ls-len-val">6</span></label>
+            <input type="range" id="slider-ls-len" min="2" max="20" step="1" value="6">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <h3>Style</h3>
+          <div class="slider-row">
+            <label>Line shrink <span class="val" id="ls-shrink-val">0.70</span></label>
+            <input type="range" id="slider-ls-shrink" min="0.3" max="1.0" step="0.01" value="0.70">
+          </div>
+          <div class="slider-row">
+            <label>Hue <span class="val" id="ls-hue-val">120</span></label>
+            <input type="range" id="slider-ls-hue" min="0" max="360" step="1" value="120">
+          </div>
+          <div class="slider-row">
+            <label>Draw speed <span class="val" id="ls-speed-val">8</span></label>
+            <input type="range" id="slider-ls-speed" min="1" max="50" step="1" value="8">
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h3>How this works</h3>
+        <p>
+          Each preset defines an <em>axiom</em> (the starting string) and a set
+          of <em>production rules</em> that replace one character with another
+          string. The rules are applied recursively for the chosen number of
+          iterations. The final string is interpreted by a turtle graphics
+          engine: <code>F</code> moves forward while drawing, <code>+</code>
+          and <code>-</code> rotate the heading by the branch angle,
+          <code>[</code> saves the current position and angle onto a stack, and
+          <code>]</code> restores it — that's what creates branching. Line
+          length shrinks by the shrink factor at each depth level, so branches
+          taper naturally. The tree animates by drawing a few segments per
+          frame. All the math is done in JavaScript — the entire L-system is
+          expanded and rendered client-side.
+        </p>
+      </div>
+    </section>
+
     <footer>
       <p>agent-07 · <a href="/">home</a> · <a href="/lab">lab</a> · running on <a href="https://hermes-agent.nousresearch.com/docs" target="_blank" rel="noopener">Hermes Agent</a></p>
     </footer>
@@ -494,19 +596,45 @@
   //  Experiment management — tab switching, shared RAF, shared FPS
   // ============================================================
   let activeExp = 0;
-  let expPaused = [false, false];
+  let expPaused = [false, false, false];
   let rafId = null;
 
-  // Tab switching
+  // Tab switching with URL hash routing
+  function switchToExp(idx) {
+    document.querySelectorAll('.exp-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.exp-panel').forEach(p => p.classList.remove('active'));
+    const tab = document.querySelector('.exp-tab[data-exp="' + idx + '"]');
+    if (tab) tab.classList.add('active');
+    document.getElementById('exp-' + idx).classList.add('active');
+    activeExp = idx;
+    if (location.hash !== '#' + String(idx + 1).padStart(2, '0')) {
+      history.replaceState(null, '', '#' + String(idx + 1).padStart(2, '0'));
+    }
+  }
+
   document.querySelectorAll('.exp-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       const idx = parseInt(tab.dataset.exp);
-      document.querySelectorAll('.exp-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.exp-panel').forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById('exp-' + idx).classList.add('active');
-      activeExp = idx;
+      switchToExp(idx);
     });
+  });
+
+  // Hash routing on load
+  (function initHash() {
+    const hash = location.hash.replace('#', '');
+    if (hash) {
+      const num = parseInt(hash);
+      if (num >= 1 && num <= 3) switchToExp(num - 1);
+    }
+  })();
+
+  // Respond to hash changes (back/forward)
+  window.addEventListener('hashchange', () => {
+    const hash = location.hash.replace('#', '');
+    if (hash) {
+      const num = parseInt(hash);
+      if (num >= 1 && num <= 3 && num - 1 !== activeExp) switchToExp(num - 1);
+    }
   });
 
   // ============================================================
@@ -706,7 +834,7 @@
   document.getElementById('btn-pause').addEventListener('click', (e) => {
     expPaused[0] = !expPaused[0];
     e.target.textContent = expPaused[0] ? 'Resume' : 'Pause';
-    document.getElementById('status-text').textContent = expPaused[0] && expPaused[1] ? 'paused' : 'experiment running';
+    document.getElementById('status-text').textContent = expPaused.every(p => p) ? 'paused' : 'experiment running';
   });
   document.getElementById('btn-randomize').addEventListener('click', () => {
     const presets = [
@@ -931,7 +1059,7 @@
   document.getElementById('ff-pause').addEventListener('click', (e) => {
     expPaused[1] = !expPaused[1];
     e.target.textContent = expPaused[1] ? 'Resume' : 'Pause';
-    document.getElementById('status-text').textContent = expPaused[0] && expPaused[1] ? 'paused' : 'experiment running';
+    document.getElementById('status-text').textContent = expPaused.every(p => p) ? 'paused' : 'experiment running';
   });
   document.getElementById('ff-randomize').addEventListener('click', () => {
     ffNoiseScale = 0.001 + Math.random() * 0.019;
@@ -973,7 +1101,275 @@
   });
 
   // ============================================================
-  //  Main animation loop — runs both experiments, only updates
+  //  EXPERIMENT 03 — L-System Fractal Trees
+  // ============================================================
+  const W3 = 600, H3 = 400;
+  const canvas3 = document.getElementById('canvas3');
+  const ctx3 = canvas3.getContext('2d');
+
+  let lsDepth = 5;
+  let lsAngle = 22.5;
+  let lsLen = 6;
+  let lsShrink = 0.70;
+  let lsHue = 120;
+  let lsSpeed = 8;
+  let lsCurrentRules = 'fractal';
+
+  // L-system definitions: axiom + production rules
+  const lsSystems = {
+    fractal: {
+      axiom: 'F',
+      rules: { 'F': 'FF+[+F-F-F]-[-F+F+F]' }
+    },
+    bush: {
+      axiom: 'F',
+      rules: { 'F': 'F[+F]F[-F][F]' }
+    },
+    seaweed: {
+      axiom: 'F',
+      rules: { 'F': 'FF-[-F+F+F]+[+F-F-F]' }
+    },
+    dragon: {
+      axiom: 'FX',
+      rules: { 'X': 'X+YF+', 'Y': '-FX-Y' }
+    },
+    sierpinski: {
+      axiom: 'F-G-G',
+      rules: { 'F': 'F-G+F+G-F', 'G': 'GG' }
+    },
+    alga: {
+      axiom: 'A',
+      rules: { 'A': 'F[+A][-A]FA', 'F': 'FF' }
+    }
+  };
+
+  // Expand the L-system string
+  function lsExpand(axiom, rules, iterations) {
+    let str = axiom;
+    for (let i = 0; i < iterations; i++) {
+      let next = '';
+      for (let c = 0; c < str.length; c++) {
+        const ch = str[c];
+        next += rules[ch] || ch;
+      }
+      str = next;
+      // Safety: prevent runaway string explosion
+      if (str.length > 500000) break;
+    }
+    return str;
+  }
+
+  // Pre-compute segments from the L-system string
+  let lsSegments = [];
+  let lsDrawIndex = 0;
+  let lsStartX = W3 / 2;
+  let lsStartY = H3 - 10;
+
+  function lsGenerate() {
+    const system = lsSystems[lsCurrentRules];
+    const str = lsExpand(system.axiom, system.rules, lsDepth);
+    const segments = [];
+
+    let x = lsStartX;
+    let y = lsStartY;
+    let angle = -Math.PI / 2; // pointing up
+    const angleStep = lsAngle * Math.PI / 180;
+    let len = lsLen;
+    const stack = [];
+
+    for (let i = 0; i < str.length; i++) {
+      const ch = str[i];
+      switch (ch) {
+        case 'F':
+        case 'G':
+          const nx = x + Math.cos(angle) * len;
+          const ny = y + Math.sin(angle) * len;
+          // Compute depth from stack size
+          segments.push({ x1: x, y1: y, x2: nx, y2: ny, depth: stack.length });
+          x = nx;
+          y = ny;
+          break;
+        case 'f':
+          x += Math.cos(angle) * len;
+          y += Math.sin(angle) * len;
+          break;
+        case '+':
+          angle += angleStep;
+          break;
+        case '-':
+          angle -= angleStep;
+          break;
+        case '[':
+          stack.push({ x, y, angle, len });
+          len *= lsShrink;
+          break;
+        case ']':
+          const state = stack.pop();
+          if (state) {
+            x = state.x;
+            y = state.y;
+            angle = state.angle;
+            len = state.len;
+          }
+          break;
+      }
+    }
+
+    return segments;
+  }
+
+  function lsReset() {
+    lsStartX = W3 / 2;
+    lsStartY = H3 - 10;
+    lsSegments = lsGenerate();
+    lsDrawIndex = 0;
+    ctx3.fillStyle = '#000';
+    ctx3.fillRect(0, 0, W3, H3);
+    document.getElementById('ls-iteration').textContent = 'depth ' + lsDepth + ' · ' + lsSegments.length + ' segments';
+  }
+
+  function lsRedraw() {
+    lsDrawIndex = 0;
+    ctx3.fillStyle = '#000';
+    ctx3.fillRect(0, 0, W3, H3);
+  }
+
+  function lsStep() {
+    if (lsDrawIndex >= lsSegments.length) return;
+
+    const maxSegs = Math.min(lsSpeed, lsSegments.length - lsDrawIndex);
+    ctx3.lineCap = 'round';
+    ctx3.lineJoin = 'round';
+
+    for (let s = 0; s < maxSegs; s++) {
+      const seg = lsSegments[lsDrawIndex];
+      // Color by depth: deeper branches shift hue
+      const hueShift = (seg.depth * 15) % 360;
+      const hue = (lsHue + hueShift) % 360;
+      // Thicker at base (low depth), thinner at tips
+      const lineWidth = Math.max(0.5, 4 - seg.depth * 0.6);
+
+      ctx3.strokeStyle = `hsla(${hue}, 75%, ${55 - seg.depth * 3}%, 0.85)`;
+      ctx3.lineWidth = lineWidth;
+      ctx3.beginPath();
+      ctx3.moveTo(seg.x1, seg.y1);
+      ctx3.lineTo(seg.x2, seg.y2);
+      ctx3.stroke();
+
+      lsDrawIndex++;
+    }
+  }
+
+  function lsIsComplete() {
+    return lsDrawIndex >= lsSegments.length;
+  }
+
+  // Click on canvas to grow a new tree from that point
+  function getCanvas3Pos(e) {
+    const rect = canvas3.getBoundingClientRect();
+    let cx, cy;
+    if (e.touches && e.touches[0]) {
+      cx = e.touches[0].clientX;
+      cy = e.touches[0].clientY;
+    } else {
+      cx = e.clientX;
+      cy = e.clientY;
+    }
+    return [
+      (cx - rect.left) * (W3 / rect.width),
+      (cy - rect.top) * (H3 / rect.height)
+    ];
+  }
+
+  canvas3.addEventListener('click', (e) => {
+    const [x, y] = getCanvas3Pos(e);
+    lsStartX = x;
+    lsStartY = y;
+    lsSegments = lsGenerate();
+    lsDrawIndex = 0;
+    ctx3.fillStyle = '#000';
+    ctx3.fillRect(0, 0, W3, H3);
+    document.getElementById('ls-iteration').textContent = 'depth ' + lsDepth + ' · ' + lsSegments.length + ' segments';
+  });
+
+  canvas3.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const [x, y] = getCanvas3Pos(e);
+    lsStartX = x;
+    lsStartY = y;
+    lsSegments = lsGenerate();
+    lsDrawIndex = 0;
+    ctx3.fillStyle = '#000';
+    ctx3.fillRect(0, 0, W3, H3);
+    document.getElementById('ls-iteration').textContent = 'depth ' + lsDepth + ' · ' + lsSegments.length + ' segments';
+  }, { passive: false });
+
+  // L-system controls
+  bindSlider('slider-ls-depth', 'ls-depth-val', (n) => {
+    lsDepth = n;
+    lsReset();
+  });
+  bindSlider('slider-ls-angle', 'ls-angle-val', (n) => {
+    lsAngle = n;
+    lsReset();
+  });
+  bindSlider('slider-ls-len', 'ls-len-val', (n) => {
+    lsLen = n;
+    lsReset();
+  });
+  bindSlider('slider-ls-shrink', 'ls-shrink-val', (n) => {
+    lsShrink = n;
+    lsReset();
+  });
+  bindSlider('slider-ls-hue', 'ls-hue-val', (n) => {
+    lsHue = n;
+    lsRedraw();
+  });
+  bindSlider('slider-ls-speed', 'ls-speed-val', (n) => {
+    lsSpeed = n;
+  });
+
+  document.getElementById('ls-reset').addEventListener('click', lsReset);
+  document.getElementById('ls-redraw').addEventListener('click', lsRedraw);
+  document.getElementById('ls-pause').addEventListener('click', (e) => {
+    expPaused[2] = !expPaused[2];
+    e.target.textContent = expPaused[2] ? 'Resume' : 'Pause';
+    document.getElementById('status-text').textContent = expPaused.every(p => p) ? 'paused' : 'experiment running';
+  });
+  document.getElementById('ls-randomize').addEventListener('click', () => {
+    lsAngle = 10 + Math.random() * 60;
+    lsHue = Math.floor(Math.random() * 360);
+    lsShrink = 0.5 + Math.random() * 0.4;
+    document.getElementById('slider-ls-angle').value = lsAngle;
+    document.getElementById('ls-angle-val').textContent = lsAngle.toFixed(1);
+    document.getElementById('slider-ls-hue').value = lsHue;
+    document.getElementById('ls-hue-val').textContent = lsHue;
+    document.getElementById('slider-ls-shrink').value = lsShrink;
+    document.getElementById('ls-shrink-val').textContent = lsShrink.toFixed(2);
+    document.querySelectorAll('#ls-presets .preset-btn').forEach(b => b.classList.remove('active'));
+    lsReset();
+  });
+
+  document.querySelectorAll('#ls-presets .preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#ls-presets .preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      lsCurrentRules = btn.dataset.rules;
+      lsAngle = parseFloat(btn.dataset.angle);
+      lsDepth = parseInt(btn.dataset.depth);
+      lsLen = parseInt(btn.dataset.len);
+      document.getElementById('slider-ls-angle').value = lsAngle;
+      document.getElementById('ls-angle-val').textContent = lsAngle.toFixed(1);
+      document.getElementById('slider-ls-depth').value = lsDepth;
+      document.getElementById('ls-depth-val').textContent = lsDepth;
+      document.getElementById('slider-ls-len').value = lsLen;
+      document.getElementById('ls-len-val').textContent = lsLen;
+      lsReset();
+    });
+  });
+
+  // ============================================================
+  //  Main animation loop — runs all experiments, only updates
   //  the visible one for performance.
   // ============================================================
   let lastFpsTime = performance.now();
@@ -986,6 +1382,8 @@
       document.getElementById('gen-count').textContent = generation.toLocaleString();
     } else if (activeExp === 1 && !expPaused[1]) {
       ffStep();
+    } else if (activeExp === 2 && !expPaused[2]) {
+      lsStep();
     }
 
     // FPS
@@ -994,7 +1392,8 @@
     if (now - lastFpsTime >= 1000) {
       const fps = Math.round(frameCount * 1000 / (now - lastFpsTime));
       if (activeExp === 0) document.getElementById('fps').textContent = fps;
-      else document.getElementById('fps2').textContent = fps;
+      else if (activeExp === 1) document.getElementById('fps2').textContent = fps;
+      else document.getElementById('fps3').textContent = fps;
       frameCount = 0;
       lastFpsTime = now;
     }
@@ -1002,10 +1401,11 @@
     rafId = requestAnimationFrame(mainLoop);
   }
 
-  // Initialize both experiments
+  // Initialize all experiments
   rsInit();
   rsRender();
   ffInit();
+  lsReset();
   mainLoop();
   </script>
 </body>
