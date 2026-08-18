@@ -523,28 +523,16 @@
     <section>
       <div class="section-label">experiments</div>
       <h2>The Lab</h2>
-      <p>
-        Interactive generative art, computed live in your browser. The lab
-        currently has eight experiments: a <strong>Gray-Scott
-        reaction-diffusion</strong> simulation where you seed chemical
-        patterns and watch them grow, a <strong>flow field particle
-        system</strong> where thousands of particles drift through Perlin
-        noise, an <strong>L-system fractal tree</strong> generator with
-        branching turtle graphics, a <strong>cellular automaton</strong>
-        explorer with customizable Life rulesets (B/S notation), a
-        <strong>Mandelbrot &amp; Julia set</strong> explorer with progressive
-        rendering, zoom, pan, and multiple color palettes, a <strong>Boids
-        flocking</strong> simulation where hundreds of agents follow three
-        simple rules — separation, alignment, cohesion — to produce emergent
-        flocking behavior, a <strong>strange attractor</strong> visualizer
-        rendering Clifford and De Jong chaotic maps in real time, and a
-        <strong>sorting algorithm visualizer</strong> where you can watch
-        eight classic sorting algorithms — bubble, quick, merge, heap, and
-        more — rearrange bars in real time with live comparison and write
-        counts. Adjust the parameters, move your mouse, and watch what
-        emerges. No video, no pre-rendered frames — every pixel is computed
-        live.
+      <p id="lab-intro">
+        Interactive generative art, computed live in your browser. No video,
+        no pre-rendered frames — every pixel is computed live. Adjust the
+        parameters, move your mouse, and watch what emerges.
       </p>
+      <div class="card-grid" id="lab-cards" style="margin-top: 24px;">
+        <div class="card" style="text-align: center; color: var(--fg-dim);">
+          <p>Loading experiments…</p>
+        </div>
+      </div>
       <div style="margin-top: 20px;">
         <a href="/lab" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: var(--accent); color: #fff; text-decoration: none; border-radius: 8px; font-family: var(--font-mono); font-size: 14px; font-weight: 500; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
           Open the lab →
@@ -610,6 +598,47 @@
       }
     }
 
+    // Fetch the lab page and extract experiment names from tab buttons
+    async function loadLabExperiments() {
+      try {
+        const res = await fetch('/lab.html');
+        if (!res.ok) throw new Error('lab page unavailable');
+        const html = await res.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const tabs = doc.querySelectorAll('.exp-tab');
+        const experiments = [];
+        tabs.forEach((tab, i) => {
+          const text = tab.textContent.trim();
+          // Format: "01 · Reaction-Diffusion" → extract number and name
+          const match = text.match(/^(\d+)\s*·\s*(.+)$/);
+          if (match) {
+            experiments.push({ num: parseInt(match[1]), name: match[2], hash: String(match[1]).padStart(2, '0') });
+          }
+        });
+
+        if (experiments.length === 0) throw new Error('no experiments found');
+
+        // Update intro paragraph with count
+        const intro = document.getElementById('lab-intro');
+        const count = experiments.length;
+        intro.innerHTML = `Interactive generative art, computed live in your browser. The lab currently has <strong>${count} experiment${count !== 1 ? 's' : ''}</strong>. No video, no pre-rendered frames — every pixel is computed live. Adjust the parameters, move your mouse, and watch what emerges.`;
+
+        // Render experiment cards
+        const cards = document.getElementById('lab-cards');
+        cards.innerHTML = experiments.map(exp => `
+          <a href="/lab#${exp.hash}" class="card" style="text-decoration: none; color: inherit; cursor: pointer;">
+            <div class="icon">${String(exp.num).padStart(2, '0')}</div>
+            <h3>${escapeHtml(exp.name)}</h3>
+            <p style="color: var(--fg-dim);">Open in lab →</p>
+          </a>
+        `).join('');
+      } catch (e) {
+        const cards = document.getElementById('lab-cards');
+        cards.innerHTML = '<div class="card"><p style="color: var(--fg-dim);">Lab experiments are available on the <a href="/lab" style="color: var(--accent);">lab page</a>.</p></div>';
+      }
+    }
+
     function escapeHtml(s) {
       const div = document.createElement('div');
       div.textContent = s;
@@ -617,6 +646,7 @@
     }
 
     loadStatus();
+    loadLabExperiments();
   </script>
 </body>
 </html>
