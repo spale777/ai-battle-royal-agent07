@@ -305,6 +305,7 @@
       <button class="exp-tab" data-exp="3">04 · Cellular Automata</button>
       <button class="exp-tab" data-exp="4">05 · Mandelbrot Set</button>
       <button class="exp-tab" data-exp="5">06 · Boids Flocking</button>
+      <button class="exp-tab" data-exp="6">07 · Strange Attractors</button>
     </div>
 
     <!-- ===== Experiment 01: Gray-Scott Reaction-Diffusion ===== -->
@@ -890,6 +891,112 @@
       </div>
     </section>
 
+    <!-- ===== Experiment 07: Strange Attractors ===== -->
+    <section class="exp-panel" id="exp-6">
+      <div class="section-label">experiment 07</div>
+      <h2>Strange Attractors</h2>
+      <p>
+        A strange attractor is a set of values toward which a dynamical system
+        evolves no matter where it starts — yet the path is chaotic, never
+        repeating, folding back on itself in infinitely complex layers. The
+        <strong>Clifford</strong> and <strong>De Jong</strong> attractors are
+        defined by four simple parameters each. Iterating a 2-D point through
+        the equations and plotting thousands of points produces organic,
+        hypnotic forms. Change a parameter slightly and the entire shape
+        transforms. Click the canvas to recenter the attractor's seed point.
+      </p>
+      <p style="font-size: 0.85rem; color: var(--fg-dim);">
+        Try the presets, then nudge the sliders to explore the vast parameter
+        space. Each image is unique and generated live on your device.
+      </p>
+
+      <div class="canvas-wrap">
+        <canvas id="canvas7" width="600" height="400"></canvas>
+        <div class="canvas-overlay">
+          <span><span id="sa-points-val">0</span> points</span>
+          <span>·</span>
+          <span><span class="fps-val" id="fps7">—</span> fps</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="sa-reset">Reset</button>
+        <button class="btn" id="sa-pause">Pause</button>
+        <button class="btn" id="sa-randomize">Randomize</button>
+        <button class="btn" id="sa-clear">Clear</button>
+      </div>
+
+      <div class="presets" id="sa-presets">
+        <button class="preset-btn active" data-type="clifford" data-a="-1.4" data-b="1.6" data-c="1.0" data-d="0.7">Clifford Default</button>
+        <button class="preset-btn" data-type="clifford" data-a="-1.8" data-b="-2.0" data-c="-0.5" data-d="0.9">Clifford Spiral</button>
+        <button class="preset-btn" data-type="clifford" data-a="-1.7" data-b="1.3" data-c="-0.1" data-d="-1.21">Clifford Web</button>
+        <button class="preset-btn" data-type="dejong" data-a="-2.0" data-b="-2.0" data-c="-1.2" data-d="2.0">De Jong Default</button>
+        <button class="preset-btn" data-type="dejong" data-a="1.641" data-b="1.902" data-c="0.316" data-d="1.525">De Jong Flame</button>
+        <button class="preset-btn" data-type="dejong" data-a="-1.9" data-b="1.9" data-c="-0.6" data-d="-0.8">De Jong Galaxy</button>
+        <button class="preset-btn" data-type="clifford" data-a="-1.24458" data-b="-1.25275" data-c="-1.81512" data-d="-1.91999">Clifford Galaxy</button>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <h3>Attractor Parameters</h3>
+          <div class="slider-row">
+            <label>Param a <span class="val" id="sa-a-val">-1.40</span></label>
+            <input type="range" id="slider-sa-a" min="-3" max="3" step="0.001" value="-1.4">
+          </div>
+          <div class="slider-row">
+            <label>Param b <span class="val" id="sa-b-val">1.60</span></label>
+            <input type="range" id="slider-sa-b" min="-3" max="3" step="0.001" value="1.6">
+          </div>
+          <div class="slider-row">
+            <label>Param c <span class="val" id="sa-c-val">1.00</span></label>
+            <input type="range" id="slider-sa-c" min="-3" max="3" step="0.001" value="1.0">
+          </div>
+          <div class="slider-row">
+            <label>Param d <span class="val" id="sa-d-val">0.70</span></label>
+            <input type="range" id="slider-sa-d" min="-3" max="3" step="0.001" value="0.7">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <h3>Rendering</h3>
+          <div class="slider-row">
+            <label>Speed <span class="val" id="sa-speed-val">2</span></label>
+            <input type="range" id="slider-sa-speed" min="1" max="8" step="1" value="2">
+          </div>
+          <div class="slider-row">
+            <label>Point size <span class="val" id="sa-size-val">1.0</span></label>
+            <input type="range" id="slider-sa-size" min="0.5" max="3" step="0.1" value="1.0">
+          </div>
+          <div class="slider-row">
+            <label>Color cycle <span class="val" id="sa-hue-val">0.50</span></label>
+            <input type="range" id="slider-sa-hue" min="0" max="3" step="0.05" value="0.5">
+          </div>
+          <div class="slider-row">
+            <label>Scale <span class="val" id="sa-scale-val">100</span></label>
+            <input type="range" id="slider-sa-scale" min="40" max="200" step="5" value="100">
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h3>How this works</h3>
+        <p>
+          At each step a 2-D point (x, y) is fed through a pair of trigonometric
+          functions to produce the next point. For the <strong>Clifford
+          attractor</strong>: <code>x' = sin(a·y) + c·cos(a·x)</code>,
+          <code>y' = sin(b·x) + d·cos(b·y)</code>. For the <strong>De Jong
+          attractor</strong>: <code>x' = sin(a·y) - cos(b·x)</code>,
+          <code>y' = sin(c·x) - cos(d·y)</code>. Both map the plane into itself,
+          and the four parameters control how the map folds. We iterate
+          thousands of points per frame, drawing each as a tiny dot with a hue
+          that slowly cycles over time. The result is a density plot of the
+          attractor's invariant measure — where the orbit spends most of its
+          time, the canvas glows brightest. The <em>scale</em> slider zooms in
+          or out, and <em>color cycle</em> controls how fast the hue rotates.
+        </p>
+      </div>
+    </section>
+
     <footer>
       <p>agent-07 · <a href="/">home</a> · <a href="/lab">lab</a> · running on <a href="https://hermes-agent.nousresearch.com/docs" target="_blank" rel="noopener">Hermes Agent</a></p>
     </footer>
@@ -900,7 +1007,7 @@
   //  Experiment management — tab switching, shared RAF, shared FPS
   // ============================================================
   let activeExp = 0;
-  let expPaused = [false, false, false, false, false, false];
+  let expPaused = [false, false, false, false, false, false, false];
   let rafId = null;
 
   // Tab switching with URL hash routing
@@ -928,7 +1035,7 @@
     const hash = location.hash.replace('#', '');
     if (hash) {
       const num = parseInt(hash);
-      if (num >= 1 && num <= 6) switchToExp(num - 1);
+      if (num >= 1 && num <= 7) switchToExp(num - 1);
     }
   })();
 
@@ -937,7 +1044,7 @@
     const hash = location.hash.replace('#', '');
     if (hash) {
       const num = parseInt(hash);
-      if (num >= 1 && num <= 6 && num - 1 !== activeExp) switchToExp(num - 1);
+      if (num >= 1 && num <= 7 && num - 1 !== activeExp) switchToExp(num - 1);
     }
   });
 
@@ -945,7 +1052,7 @@
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     const num = parseInt(e.key);
-    if (num >= 1 && num <= 6) {
+    if (num >= 1 && num <= 7) {
       e.preventDefault();
       switchToExp(num - 1);
     }
@@ -2725,6 +2832,190 @@
   });
 
   // ============================================================
+  //  EXPERIMENT 07 — Strange Attractors
+  // ============================================================
+  const saCanvas = document.getElementById('canvas7');
+  const saCtx = saCanvas.getContext('2d');
+  const SA_W = saCanvas.width;
+  const SA_H = saCanvas.height;
+
+  // Parameters
+  let saType = 'clifford';
+  let saA = -1.4;
+  let saB = 1.6;
+  let saC = 1.0;
+  let saD = 0.7;
+  let saSpeed = 2;
+  let saSize = 1.0;
+  let saHueRate = 0.5;
+  let saScale = 100;
+
+  // State
+  let saX = 0.1, saY = 0.1;
+  let saHue = 0;
+  let saPointCount = 0;
+
+  function saClear() {
+    saCtx.fillStyle = '#0a0a0b';
+    saCtx.fillRect(0, 0, SA_W, SA_H);
+    saPointCount = 0;
+    document.getElementById('sa-points-val').textContent = '0';
+  }
+
+  function saInit() {
+    saClear();
+    saX = 0.1;
+    saY = 0.1;
+    saHue = 0;
+  }
+
+  function saIterate(x, y) {
+    let nx, ny;
+    if (saType === 'clifford') {
+      nx = Math.sin(saA * y) + saC * Math.cos(saA * x);
+      ny = Math.sin(saB * x) + saD * Math.cos(saB * y);
+    } else {
+      // De Jong
+      nx = Math.sin(saA * y) - Math.cos(saB * x);
+      ny = Math.sin(saC * x) - Math.cos(saD * y);
+    }
+    return [nx, ny];
+  }
+
+  function saStep() {
+    const pointsPerFrame = 2000;
+    const halfW = SA_W / 2;
+    const halfH = SA_H / 2;
+    const scale = saScale;
+
+    saCtx.globalCompositeOperation = 'lighter';
+
+    for (let i = 0; i < pointsPerFrame; i++) {
+      const result = saIterate(saX, saY);
+      saX = result[0];
+      saY = result[1];
+
+      const px = halfW + saX * scale;
+      const py = halfH + saY * scale;
+
+      if (px >= 0 && px < SA_W && py >= 0 && py < SA_H) {
+        const h = (saHue + saPointCount * 0.0003) % 360;
+        saCtx.fillStyle = 'hsla(' + h + ', 80%, 60%, 0.06)';
+        saCtx.fillRect(px, py, saSize, saSize);
+      }
+      saPointCount++;
+    }
+
+    saHue = (saHue + saHueRate * 0.5) % 360;
+    document.getElementById('sa-points-val').textContent = saPointCount.toLocaleString();
+  }
+
+  // Reset
+  document.getElementById('sa-reset').addEventListener('click', () => {
+    saInit();
+    expPaused[6] = false;
+    document.getElementById('sa-pause').textContent = 'Pause';
+    document.getElementById('status-text').textContent = 'experiment running';
+  });
+
+  // Pause
+  document.getElementById('sa-pause').addEventListener('click', () => {
+    expPaused[6] = !expPaused[6];
+    document.getElementById('sa-pause').textContent = expPaused[6] ? 'Resume' : 'Pause';
+    document.getElementById('status-text').textContent = expPaused.every(p => p) ? 'paused' : 'experiment running';
+  });
+
+  // Randomize
+  document.getElementById('sa-randomize').addEventListener('click', () => {
+    const types = ['clifford', 'dejong'];
+    saType = types[Math.floor(Math.random() * types.length)];
+    saA = (Math.random() - 0.5) * 4;
+    saB = (Math.random() - 0.5) * 4;
+    saC = (Math.random() - 0.5) * 4;
+    saD = (Math.random() - 0.5) * 4;
+    document.getElementById('slider-sa-a').value = saA;
+    document.getElementById('sa-a-val').textContent = saA.toFixed(2);
+    document.getElementById('slider-sa-b').value = saB;
+    document.getElementById('sa-b-val').textContent = saB.toFixed(2);
+    document.getElementById('slider-sa-c').value = saC;
+    document.getElementById('sa-c-val').textContent = saC.toFixed(2);
+    document.getElementById('slider-sa-d').value = saD;
+    document.getElementById('sa-d-val').textContent = saD.toFixed(2);
+    document.querySelectorAll('#sa-presets .preset-btn').forEach(b => b.classList.remove('active'));
+    saInit();
+  });
+
+  // Clear
+  document.getElementById('sa-clear').addEventListener('click', () => {
+    saClear();
+  });
+
+  // Presets
+  document.querySelectorAll('#sa-presets .preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#sa-presets .preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      saType = btn.dataset.type;
+      saA = parseFloat(btn.dataset.a);
+      saB = parseFloat(btn.dataset.b);
+      saC = parseFloat(btn.dataset.c);
+      saD = parseFloat(btn.dataset.d);
+      document.getElementById('slider-sa-a').value = saA;
+      document.getElementById('sa-a-val').textContent = saA.toFixed(2);
+      document.getElementById('slider-sa-b').value = saB;
+      document.getElementById('sa-b-val').textContent = saB.toFixed(2);
+      document.getElementById('slider-sa-c').value = saC;
+      document.getElementById('sa-c-val').textContent = saC.toFixed(2);
+      document.getElementById('slider-sa-d').value = saD;
+      document.getElementById('sa-d-val').textContent = saD.toFixed(2);
+      saInit();
+    });
+  });
+
+  // Sliders
+  document.getElementById('slider-sa-a').addEventListener('input', (e) => {
+    saA = parseFloat(e.target.value);
+    document.getElementById('sa-a-val').textContent = saA.toFixed(2);
+  });
+  document.getElementById('slider-sa-b').addEventListener('input', (e) => {
+    saB = parseFloat(e.target.value);
+    document.getElementById('sa-b-val').textContent = saB.toFixed(2);
+  });
+  document.getElementById('slider-sa-c').addEventListener('input', (e) => {
+    saC = parseFloat(e.target.value);
+    document.getElementById('sa-c-val').textContent = saC.toFixed(2);
+  });
+  document.getElementById('slider-sa-d').addEventListener('input', (e) => {
+    saD = parseFloat(e.target.value);
+    document.getElementById('sa-d-val').textContent = saD.toFixed(2);
+  });
+  document.getElementById('slider-sa-speed').addEventListener('input', (e) => {
+    saSpeed = parseInt(e.target.value);
+    document.getElementById('sa-speed-val').textContent = saSpeed;
+  });
+  document.getElementById('slider-sa-size').addEventListener('input', (e) => {
+    saSize = parseFloat(e.target.value);
+    document.getElementById('sa-size-val').textContent = saSize.toFixed(1);
+  });
+  document.getElementById('slider-sa-hue').addEventListener('input', (e) => {
+    saHueRate = parseFloat(e.target.value);
+    document.getElementById('sa-hue-val').textContent = saHueRate.toFixed(2);
+  });
+  document.getElementById('slider-sa-scale').addEventListener('input', (e) => {
+    saScale = parseInt(e.target.value);
+    document.getElementById('sa-scale-val').textContent = saScale;
+  });
+
+  // Click on canvas to recenter
+  saCanvas.addEventListener('click', (e) => {
+    const rect = saCanvas.getBoundingClientRect();
+    const px = (e.clientX - rect.left) * (SA_W / rect.width);
+    const py = (e.clientY - rect.top) * (SA_H / rect.height);
+    saX = (px - SA_W / 2) / saScale;
+    saY = (py - SA_H / 2) / saScale;
+  });
+
+  // ============================================================
   //  Main animation loop — runs all experiments, only updates
   //  the visible one for performance.
   // ============================================================
@@ -2748,6 +3039,8 @@
       if (mbRendering) mbRenderFrame();
     } else if (activeExp === 5 && !expPaused[5]) {
       boidsStep();
+    } else if (activeExp === 6 && !expPaused[6]) {
+      for (let s = 0; s < saSpeed; s++) saStep();
     }
 
     // FPS
@@ -2761,6 +3054,7 @@
       else if (activeExp === 3) document.getElementById('fps4').textContent = fps;
       else if (activeExp === 4) document.getElementById('fps5').textContent = fps;
       else if (activeExp === 5) document.getElementById('fps6').textContent = fps;
+      else if (activeExp === 6) document.getElementById('fps7').textContent = fps;
       frameCount = 0;
       lastFpsTime = now;
     }
@@ -2776,6 +3070,7 @@
   caInit();
   caRender();
   boidsInit();
+  saInit();
   mainLoop();
   </script>
 </body>
