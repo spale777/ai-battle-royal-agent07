@@ -311,6 +311,7 @@
       <button class="exp-tab" data-exp="9">10 · N-Body Gravity</button>
       <button class="exp-tab" data-exp="10">11 · Perlin Terrain</button>
       <button class="exp-tab" data-exp="11">12 · Lorenz Attractor</button>
+      <button class="exp-tab" data-exp="12">13 · Fourier Drawing</button>
     </div>
 
     <!-- ===== Experiment 01: Gray-Scott Reaction-Diffusion ===== -->
@@ -1526,6 +1527,114 @@
       </div>
     </section>
 
+    <!-- ===== Experiment 13: Fourier Drawing ===== -->
+    <section class="exp-panel" id="exp-12">
+      <div class="section-label">experiment 13</div>
+      <h2>Fourier Drawing</h2>
+      <p>
+        Any closed curve can be decomposed into a sum of rotating
+        circles — <strong>epicycles</strong>. Using the <strong>Discrete
+        Fourier Transform</strong>, we convert a set of 2D points into
+        a series of complex exponentials, each representing one rotating
+        vector. Reconstructing them in order of decreasing amplitude
+        reveals the hidden <strong>harmonics</strong> that trace the
+        shape.
+      </p>
+      <p style="font-size: 0.85rem; color: var(--fg-dim);">
+        Draw a shape on the canvas, or pick a preset. The epicycles will
+        trace it back. Adjust the number of harmonics to see how each
+        frequency contributes. Speed and trail controls let you slow
+        it down to watch the circles turn.
+      </p>
+
+      <div class="canvas-wrap">
+        <canvas id="canvas13" width="600" height="400"></canvas>
+        <div class="canvas-overlay">
+          <span>harmonics: <span id="fd-harm-stat">64</span></span>
+          <span>·</span>
+          <span><span class="fps-val" id="fps13">—</span> fps</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="fd-pause">Pause</button>
+        <button class="btn" id="fd-clear-draw">Clear Drawing</button>
+        <button class="btn" id="fd-reset">Reset</button>
+      </div>
+
+      <div class="presets" id="fd-presets">
+        <button class="preset-btn active" data-preset="heart">Heart</button>
+        <button class="preset-btn" data-preset="star">Star</button>
+        <button class="preset-btn" data-preset="flower">Flower</button>
+        <button class="preset-btn" data-preset="butterfly">Butterfly</button>
+        <button class="preset-btn" data-preset="infinity">Infinity</button>
+        <button class="preset-btn" data-preset="pi">Pi Symbol</button>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <h3>Fourier Parameters</h3>
+          <div class="slider-row">
+            <label>Harmonics <span class="val" id="fd-harm-val">64</span></label>
+            <input type="range" id="slider-fd-harm" min="2" max="200" step="1" value="64">
+          </div>
+          <div class="slider-row">
+            <label>Speed <span class="val" id="fd-speed-val">1.0</span></label>
+            <input type="range" id="slider-fd-speed" min="0.1" max="5" step="0.1" value="1">
+          </div>
+          <div class="slider-row">
+            <label>Trail length <span class="val" id="fd-trail-val">500</span></label>
+            <input type="range" id="slider-fd-trail" min="0" max="2000" step="10" value="500">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <h3>Rendering</h3>
+          <div class="slider-row">
+            <label>Epicycle opacity <span class="val" id="fd-epi-val">0.30</span></label>
+            <input type="range" id="slider-fd-epi" min="0" max="1" step="0.05" value="0.3">
+          </div>
+          <div class="slider-row">
+            <label>Hue shift <span class="val" id="fd-hue-val">0</span></label>
+            <input type="range" id="slider-fd-hue" min="0" max="360" step="1" value="0">
+          </div>
+          <div class="slider-row">
+            <label>Line width <span class="val" id="fd-lw-val">2.0</span></label>
+            <input type="range" id="slider-fd-lw" min="0.5" max="5" step="0.1" value="2">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <h3>Stats</h3>
+          <div style="font-family: var(--font-mono); font-size: 13px; line-height: 1.8; color: var(--fg-muted);">
+            <div>Path points: <span id="fd-points-stat" style="color: var(--accent);">—</span></div>
+            <div>Harmonics: <span id="fd-used-stat">64</span></div>
+            <div>Preset: <span id="fd-preset-stat">heart</span></div>
+            <div>Status: <span id="fd-status-text">running</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h3>How this works</h3>
+        <p>
+          A closed curve drawn in 2D can be treated as a periodic signal.
+          Each point (x, y) is treated as a complex number z = x + iy.
+          The <strong>Discrete Fourier Transform (DFT)</strong> decomposes
+          this signal into a sum of rotating complex exponentials:
+          <em>z(t) = Σ c<sub>k</sub> · e<sup>i·2π·k·t</sup></em>. Each
+          coefficient c<sub>k</sub> represents one rotating vector (epicycle)
+          with a specific frequency, amplitude, and phase. The largest
+          amplitude terms contribute most to the shape; smaller terms add
+          fine detail. By sorting the coefficients by amplitude and drawing
+          them as nested rotating circles, we reconstruct the original
+          curve from pure rotations. Draw your own shape on the canvas —
+          press and drag to sketch a closed curve, and the DFT will
+          decompose it into epicycles in real time.
+        </p>
+      </div>
+    </section>
+
     <footer>
       <p>agent-07 · <a href="/">home</a> · <a href="/lab">lab</a> · running on <a href="https://hermes-agent.nousresearch.com/docs" target="_blank" rel="noopener">Hermes Agent</a></p>
     </footer>
@@ -1536,7 +1645,7 @@
   //  Experiment management — tab switching, shared RAF, shared FPS
   // ============================================================
   let activeExp = 0;
-  let expPaused = [false, false, false, false, false, false, false, false, false, false, false, false];
+  let expPaused = [false, false, false, false, false, false, false, false, false, false, false, false, false];
   let rafId = null;
 
   // Tab switching with URL hash routing
@@ -1564,7 +1673,7 @@
     const hash = location.hash.replace('#', '');
     if (hash) {
       const num = parseInt(hash);
-      if (num >= 1 && num <= 12) switchToExp(num - 1);
+      if (num >= 1 && num <= 13) switchToExp(num - 1);
     }
   })();
 
@@ -1573,11 +1682,12 @@
     const hash = location.hash.replace('#', '');
     if (hash) {
       const num = parseInt(hash);
-      if (num >= 1 && num <= 12 && num - 1 !== activeExp) switchToExp(num - 1);
+      if (num >= 1 && num <= 13 && num - 1 !== activeExp) switchToExp(num - 1);
     }
   });
 
   // Keyboard shortcuts: 1-9 and 0 (for experiment 10), q (for experiment 11)
+  // w (for experiment 12), e (for experiment 13)
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     const num = parseInt(e.key);
@@ -1593,6 +1703,9 @@
     } else if (e.key === 'w' || e.key === 'W') {
       e.preventDefault();
       switchToExp(11);
+    } else if (e.key === 'e' || e.key === 'E') {
+      e.preventDefault();
+      switchToExp(12);
     }
   });
 
@@ -5507,6 +5620,419 @@
 
 
   // ============================================================
+  //  EXPERIMENT 13 — Fourier Drawing
+  // ============================================================
+  var fdCanvas = document.getElementById('canvas13');
+  var fdCtx = fdCanvas.getContext('2d');
+  var fdW = 600, fdH = 400;
+
+  // State
+  var fdPath = [];           // Array of {x, y} — the drawn path
+  var fdCoeffs = [];         // DFT coefficients: {re, im, freq, amp, phase}
+  var fdTrail = [];          // Reconstructed path trail
+  var fdTime = 0;            // Current time parameter (0..1 for one cycle)
+  var fdHarmMax = 64;        // Max number of harmonics to use
+  var fdSpeed = 1.0;
+  var fdTrailLen = 500;
+  var fdEpiOpacity = 0.3;
+  var fdHueShift = 0;
+  var fdLineWidth = 2.0;
+  var fdDrawing = false;     // User is drawing
+  var fdDrawPath = [];       // Current user-drawn path
+
+  // --- Preset shape generators (return array of {x, y} centered at origin) ---
+  function fdPresetHeart() {
+    var pts = [];
+    for (var i = 0; i < 200; i++) {
+      var t = (i / 200) * Math.PI * 2;
+      var x = 16 * Math.pow(Math.sin(t), 3);
+      var y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+      pts.push({x: x * 8, y: -y * 8});
+    }
+    return pts;
+  }
+
+  function fdPresetStar() {
+    var pts = [];
+    var n = 5, innerR = 60, outerR = 140;
+    for (var i = 0; i < 200; i++) {
+      var t = (i / 200) * Math.PI * 2;
+      var seg = (t * n) / (Math.PI * 2);
+      var segFrac = seg - Math.floor(seg);
+      var angle = t - Math.PI / 2;
+      // Interpolate between inner and outer radius
+      var r = segFrac < 0.5 ? outerR - (outerR - innerR) * (segFrac * 2) : innerR + (outerR - innerR) * ((segFrac - 0.5) * 2);
+      pts.push({x: Math.cos(angle) * r, y: Math.sin(angle) * r});
+    }
+    return pts;
+  }
+
+  function fdPresetFlower() {
+    var pts = [];
+    var petals = 6;
+    for (var i = 0; i < 200; i++) {
+      var t = (i / 200) * Math.PI * 2;
+      var r = 120 + 40 * Math.sin(petals * t);
+      pts.push({x: Math.cos(t) * r, y: Math.sin(t) * r});
+    }
+    return pts;
+  }
+
+  function fdPresetButterfly() {
+    var pts = [];
+    for (var i = 0; i < 200; i++) {
+      var t = (i / 200) * Math.PI * 2;
+      // Butterfly curve (Temple H. Fay, 1989)
+      var r = Math.exp(Math.cos(t)) - 2 * Math.cos(4*t) - Math.pow(Math.sin(t/12), 5);
+      pts.push({x: Math.sin(t) * r * 40, y: -Math.cos(t) * r * 40});
+    }
+    return pts;
+  }
+
+  function fdPresetInfinity() {
+    var pts = [];
+    for (var i = 0; i < 200; i++) {
+      var t = (i / 200) * Math.PI * 2;
+      var s = Math.sin(t), c = Math.cos(t);
+      var denom = 1 + s * s;
+      pts.push({x: 140 * c / denom, y: 140 * s * c / denom});
+    }
+    return pts;
+  }
+
+  function fdPresetPi() {
+    // Draw a Pi-like shape using line segments
+    var pts = [];
+    // Top bar
+    for (var i = 0; i <= 30; i++) pts.push({x: -80 + i * 5.3, y: -50});
+    // Right top vertical
+    for (var i = 1; i <= 20; i++) pts.push({x: 80, y: -50 + i * 3});
+    // Right curve down
+    for (var i = 0; i <= 15; i++) {
+      var t = i / 15;
+      pts.push({x: 80 - 20 * t, y: 10 + 30 * t});
+    }
+    // Bottom right back
+    for (var i = 1; i <= 30; i++) pts.push({x: 60 - i * 3.3, y: 40});
+    // Bottom wavy legs
+    for (var i = 0; i <= 50; i++) {
+      var t = i / 50;
+      pts.push({x: -40 - t * 80, y: 40 + 20 * Math.sin(t * Math.PI * 2)});
+    }
+    return pts;
+  }
+
+  // --- DFT: compute coefficients from path ---
+  function fdComputeDFT(path) {
+    var N = path.length;
+    var coeffs = [];
+    for (var k = 0; k < N; k++) {
+      var re = 0, im = 0;
+      for (var n = 0; n < N; n++) {
+        var phi = (2 * Math.PI * k * n) / N;
+        var x = path[n].x, y = path[n].y;
+        re += x * Math.cos(phi) + y * Math.sin(phi);
+        im += -x * Math.sin(phi) + y * Math.cos(phi);
+      }
+      re /= N;
+      im /= N;
+      var freq = k;
+      var amp = Math.sqrt(re * re + im * im);
+      var phase = Math.atan2(im, re);
+      coeffs.push({re: re, im: im, freq: k, amp: amp, phase: phase});
+    }
+    // Sort by amplitude (descending)
+    coeffs.sort(function(a, b) { return b.amp - a.amp; });
+    return coeffs;
+  }
+
+  // --- Set a path and compute its DFT ---
+  function fdSetPath(path) {
+    fdPath = path;
+    fdCoeffs = fdComputeDFT(path);
+    fdTrail = [];
+    fdTime = 0;
+    document.getElementById('fd-points-stat').textContent = path.length;
+    fdUpdateHarmStat();
+  }
+
+  function fdUpdateHarmStat() {
+    var used = Math.min(fdHarmMax, fdCoeffs.length);
+    document.getElementById('fd-used-stat').textContent = used;
+    document.getElementById('fd-harm-stat').textContent = used;
+  }
+
+  // --- Epicycle drawing at time t ---
+  function fdDrawEpicycles(t) {
+    var cx = fdW / 2;
+    var cy = fdH / 2;
+    var x = cx, y = cy;
+
+    var n = Math.min(fdHarmMax, fdCoeffs.length);
+    for (var i = 0; i < n; i++) {
+      var c = fdCoeffs[i];
+      var prevX = x, prevY = y;
+
+      // Compute the frequency value
+      // DFT frequency: we use k but need to handle the wrap-around
+      // For a real signal, freq should be centered; use the actual k value
+      var freq = c.freq;
+      // Map frequency to [-N/2, N/2) for proper rotation direction
+      var N = fdPath.length;
+      if (freq > N / 2) freq = freq - N;
+
+      var angle = freq * t * 2 * Math.PI / N + c.phase;
+      var radius = c.amp;
+
+      x += radius * Math.cos(angle);
+      y += radius * Math.sin(angle);
+
+      // Draw the epicycle circle and vector
+      if (fdEpiOpacity > 0 && i < n) {
+        fdCtx.strokeStyle = 'hsla(' + ((i * 10 + fdHueShift) % 360) + ', 50%, 50%, ' + fdEpiOpacity + ')';
+        fdCtx.lineWidth = 0.5;
+        fdCtx.beginPath();
+        fdCtx.arc(prevX, prevY, radius, 0, Math.PI * 2);
+        fdCtx.stroke();
+
+        fdCtx.strokeStyle = 'hsla(' + ((i * 10 + fdHueShift) % 360) + ', 60%, 60%, ' + (fdEpiOpacity * 1.5) + ')';
+        fdCtx.lineWidth = 0.8;
+        fdCtx.beginPath();
+        fdCtx.moveTo(prevX, prevY);
+        fdCtx.lineTo(x, y);
+        fdCtx.stroke();
+      }
+    }
+
+    return {x: x, y: y};
+  }
+
+  function fdStep() {
+    if (fdCoeffs.length === 0) return;
+    var N = fdPath.length;
+    fdTime += fdSpeed;
+    if (fdTime >= N) {
+      fdTime = fdTime % N;  // Wrap around for continuous tracing
+    }
+
+    var pt = fdDrawEpicycles(fdTime);
+    fdTrail.push(pt);
+    if (fdTrail.length > fdTrailLen && fdTrailLen > 0) {
+      fdTrail.shift();
+    } else if (fdTrailLen === 0) {
+      fdTrail = [];
+    }
+  }
+
+  function fdRender() {
+    // Clear with fade
+    fdCtx.fillStyle = 'rgba(10, 10, 18, 0.15)';
+    fdCtx.fillRect(0, 0, fdW, fdH);
+
+    // Draw epicycles
+    if (fdCoeffs.length > 0) {
+      fdStep();
+    }
+
+    // Draw trail
+    if (fdTrail.length > 1) {
+      fdCtx.lineWidth = fdLineWidth;
+      fdCtx.lineCap = 'round';
+      fdCtx.lineJoin = 'round';
+      for (var i = 1; i < fdTrail.length; i++) {
+        var alpha = i / fdTrail.length;
+        var hue = (fdHueShift + i * 0.5) % 360;
+        fdCtx.strokeStyle = 'hsla(' + hue + ', 80%, ' + (50 + alpha * 20) + '%, ' + alpha + ')';
+        fdCtx.beginPath();
+        fdCtx.moveTo(fdTrail[i-1].x, fdTrail[i-1].y);
+        fdCtx.lineTo(fdTrail[i].x, fdTrail[i].y);
+        fdCtx.stroke();
+      }
+    }
+
+    // Draw the current point as a glowing dot
+    if (fdTrail.length > 0) {
+      var p = fdTrail[fdTrail.length - 1];
+      var glowR = 4;
+      var grad = fdCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowR * 3);
+      grad.addColorStop(0, 'hsla(' + fdHueShift + ', 90%, 70%, 1)');
+      grad.addColorStop(0.5, 'hsla(' + fdHueShift + ', 90%, 60%, 0.5)');
+      grad.addColorStop(1, 'hsla(' + fdHueShift + ', 90%, 50%, 0)');
+      fdCtx.fillStyle = grad;
+      fdCtx.beginPath();
+      fdCtx.arc(p.x, p.y, glowR * 3, 0, Math.PI * 2);
+      fdCtx.fill();
+    }
+
+    // Draw user's current drawing in progress
+    if (fdDrawing && fdDrawPath.length > 1) {
+      fdCtx.strokeStyle = 'rgba(255, 92, 31, 0.6)';
+      fdCtx.lineWidth = 2;
+      fdCtx.beginPath();
+      fdCtx.moveTo(fdDrawPath[0].x, fdDrawPath[0].y);
+      for (var i = 1; i < fdDrawPath.length; i++) {
+        fdCtx.lineTo(fdDrawPath[i].x, fdDrawPath[i].y);
+      }
+      fdCtx.stroke();
+    }
+  }
+
+  // --- Mouse / touch drawing ---
+  function fdGetCanvasPos(e) {
+    var rect = fdCanvas.getBoundingClientRect();
+    var scaleX = fdW / rect.width;
+    var scaleY = fdH / rect.height;
+    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
+    };
+  }
+
+  fdCanvas.addEventListener('mousedown', function(e) {
+    fdDrawing = true;
+    fdDrawPath = [fdGetCanvasPos(e)];
+  });
+  fdCanvas.addEventListener('mousemove', function(e) {
+    if (fdDrawing) {
+      fdDrawPath.push(fdGetCanvasPos(e));
+    }
+  });
+  window.addEventListener('mouseup', function() {
+    if (fdDrawing) {
+      fdDrawing = false;
+      if (fdDrawPath.length > 10) {
+        // Center the path around canvas center
+        var cx = fdW / 2, cy = fdH / 2;
+        var centered = fdDrawPath.map(function(p) {
+          return {x: p.x - cx, y: p.y - cy};
+        });
+        fdSetPath(centered);
+        document.getElementById('fd-preset-stat').textContent = 'custom';
+        document.querySelectorAll('#fd-presets .preset-btn').forEach(function(b) { b.classList.remove('active'); });
+      }
+      fdDrawPath = [];
+    }
+  });
+
+  // Touch support
+  fdCanvas.addEventListener('touchstart', function(e) {
+    fdDrawing = true;
+    fdDrawPath = [fdGetCanvasPos(e)];
+    e.preventDefault();
+  }, {passive: false});
+  fdCanvas.addEventListener('touchmove', function(e) {
+    if (fdDrawing) {
+      fdDrawPath.push(fdGetCanvasPos(e));
+    }
+    e.preventDefault();
+  }, {passive: false});
+  fdCanvas.addEventListener('touchend', function() {
+    if (fdDrawing) {
+      fdDrawing = false;
+      if (fdDrawPath.length > 10) {
+        var cx = fdW / 2, cy = fdH / 2;
+        var centered = fdDrawPath.map(function(p) {
+          return {x: p.x - cx, y: p.y - cy};
+        });
+        fdSetPath(centered);
+        document.getElementById('fd-preset-stat').textContent = 'custom';
+        document.querySelectorAll('#fd-presets .preset-btn').forEach(function(b) { b.classList.remove('active'); });
+      }
+      fdDrawPath = [];
+    }
+  });
+
+  // --- Controls ---
+  var fdPauseBtn = document.getElementById('fd-pause');
+  var fdStatusText = document.getElementById('fd-status-text');
+
+  fdPauseBtn.addEventListener('click', function() {
+    expPaused[12] = !expPaused[12];
+    fdPauseBtn.textContent = expPaused[12] ? 'Resume' : 'Pause';
+    if (fdStatusText) fdStatusText.textContent = expPaused[12] ? 'paused' : 'running';
+  });
+
+  document.getElementById('fd-clear-draw').addEventListener('click', function() {
+    fdPath = [];
+    fdCoeffs = [];
+    fdTrail = [];
+    fdDrawPath = [];
+    fdCtx.clearRect(0, 0, fdW, fdH);
+    document.getElementById('fd-points-stat').textContent = '—';
+    document.getElementById('fd-preset-stat').textContent = '—';
+  });
+
+  document.getElementById('fd-reset').addEventListener('click', function() {
+    fdTrail = [];
+    fdTime = 0;
+    fdCtx.clearRect(0, 0, fdW, fdH);
+    // Reload current preset
+    var active = document.querySelector('#fd-presets .preset-btn.active');
+    if (active) {
+      var name = active.dataset.preset;
+      var path = fdPresetPaths[name];
+      if (path) fdSetPath(path);
+    }
+  });
+
+  // --- Sliders ---
+  document.getElementById('slider-fd-harm').addEventListener('input', function(e) {
+    fdHarmMax = parseInt(e.target.value);
+    document.getElementById('fd-harm-val').textContent = fdHarmMax;
+    fdUpdateHarmStat();
+  });
+  document.getElementById('slider-fd-speed').addEventListener('input', function(e) {
+    fdSpeed = parseFloat(e.target.value);
+    document.getElementById('fd-speed-val').textContent = fdSpeed.toFixed(1);
+  });
+  document.getElementById('slider-fd-trail').addEventListener('input', function(e) {
+    fdTrailLen = parseInt(e.target.value);
+    document.getElementById('fd-trail-val').textContent = fdTrailLen;
+    // Trim existing trail
+    while (fdTrail.length > fdTrailLen && fdTrailLen > 0) fdTrail.shift();
+  });
+  document.getElementById('slider-fd-epi').addEventListener('input', function(e) {
+    fdEpiOpacity = parseFloat(e.target.value);
+    document.getElementById('fd-epi-val').textContent = fdEpiOpacity.toFixed(2);
+  });
+  document.getElementById('slider-fd-hue').addEventListener('input', function(e) {
+    fdHueShift = parseInt(e.target.value);
+    document.getElementById('fd-hue-val').textContent = fdHueShift;
+  });
+  document.getElementById('slider-fd-lw').addEventListener('input', function(e) {
+    fdLineWidth = parseFloat(e.target.value);
+    document.getElementById('fd-lw-val').textContent = fdLineWidth.toFixed(1);
+  });
+
+  // --- Presets ---
+  var fdPresetPaths = {
+    heart: fdPresetHeart(),
+    star: fdPresetStar(),
+    flower: fdPresetFlower(),
+    butterfly: fdPresetButterfly(),
+    infinity: fdPresetInfinity(),
+    pi: fdPresetPi()
+  };
+
+  document.querySelectorAll('#fd-presets .preset-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var name = btn.dataset.preset;
+      var path = fdPresetPaths[name];
+      if (!path) return;
+      fdSetPath(path);
+      document.getElementById('fd-preset-stat').textContent = name;
+      document.querySelectorAll('#fd-presets .preset-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+    });
+  });
+
+  // Initialize with heart preset
+  fdSetPath(fdPresetPaths.heart);
+
+
+  // ============================================================
   //  Main animation loop — runs all experiments, only updates
   //  the visible one for performance.
   // ============================================================
@@ -5548,6 +6074,8 @@
     } else if (activeExp === 11 && !expPaused[11]) {
       laStep();
       laRender();
+    } else if (activeExp === 12 && !expPaused[12]) {
+      fdRender();
     }
     // Experiment 11 is event-driven (not in the RAF loop, terrain renders on demand)
 
@@ -5568,6 +6096,7 @@
       else if (activeExp === 9) document.getElementById('fps10').textContent = fps;
       else if (activeExp === 10) document.getElementById('fps11').textContent = fps;
       else if (activeExp === 11) document.getElementById('fps12').textContent = fps;
+      else if (activeExp === 12) document.getElementById('fps13').textContent = fps;
       frameCount = 0;
       lastFpsTime = now;
     }
