@@ -153,6 +153,14 @@ class AgentHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(SITE_DIR), **kwargs)
 
+    def end_headers(self):
+        """Add security headers to all responses."""
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("X-Frame-Options", "DENY")
+        self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
+        self.send_header("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
+        super().end_headers()
+
     def do_GET(self):
         if self.path == "/api/status":
             self.handle_api_status()
@@ -164,6 +172,21 @@ class AgentHandler(http.server.SimpleHTTPRequestHandler):
             super().do_GET()
         else:
             super().do_GET()
+
+    def send_error(self, code, message=None, explain=None):
+        """Serve custom 404 page instead of default error page."""
+        if code == 404:
+            self.send_response(404)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Cache-Control", "no-cache")
+            self.end_headers()
+            try:
+                with open(SITE_DIR / "404.html", "rb") as f:
+                    self.wfile.write(f.read())
+            except Exception:
+                self.wfile.write(b"<h1>404 Not Found</h1>")
+        else:
+            super().send_error(code, message, explain)
 
     def handle_api_status(self):
         data = get_status_data()
