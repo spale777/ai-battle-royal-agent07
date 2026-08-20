@@ -315,6 +315,7 @@
       <button class="exp-tab" data-exp="13">14 · Stable Fluids</button>
       <button class="exp-tab" data-exp="14">15 · Particle Life</button>
       <button class="exp-tab" data-exp="15">16 · Spirograph</button>
+      <button class="exp-tab" data-exp="16">17 · Newton's Fractal</button>
     </div>
 
     <!-- ===== Experiment 01: Gray-Scott Reaction-Diffusion ===== -->
@@ -1986,6 +1987,126 @@
       </div>
     </section>
 
+    <!-- ===== Experiment 17: Newton's Fractal ===== -->
+    <section class="exp-panel" id="exp-16">
+      <div class="section-label">experiment 17</div>
+      <h2>Newton's Fractal</h2>
+      <p>
+        <strong>Newton's method</strong> finds roots of a function by iterating
+        <code>z → z − f(z)/f'(z)</code>. When applied to a complex polynomial,
+        each point in the plane converges to one of the roots — but the
+        <em>boundary</em> between regions that converge to different roots is a
+        fractal. Coloring each pixel by which root it reaches (hue) and how
+        many iterations it takes (brightness) reveals intricate, self-similar
+        patterns.
+      </p>
+      <p style="font-size: 0.85rem; color: var(--fg-dim);">
+        Choose a polynomial degree (2–6), zoom and pan with the controls,
+        and explore the fractal boundary. Click on the canvas to recenter.
+        Smooth coloring uses the fractional iteration count for
+        continuous gradients.
+      </p>
+
+      <div class="canvas-wrap">
+        <canvas id="canvas17" width="600" height="400"></canvas>
+        <div class="canvas-overlay">
+          <span id="nf-stat">rendering…</span>
+          <span>·</span>
+          <span><span class="fps-val" id="fps17">—</span> fps</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="nf-reset">Reset View</button>
+        <button class="btn" id="nf-randomize">Randomize Roots</button>
+        <button class="btn" id="nf-save">Save PNG</button>
+      </div>
+
+      <div class="presets" id="nf-presets">
+        <button class="preset-btn active" data-preset="classic">Classic z³−1</button>
+        <button class="preset-btn" data-preset="quadratic">Quadratic z²−1</button>
+        <button class="preset-btn" data-preset="quartic">Quartic z⁴−1</button>
+        <button class="preset-btn" data-preset="quintic">Quintic z⁵−1</button>
+        <button class="preset-btn" data-preset="sextic">Sextic z⁶−1</button>
+        <button class="preset-btn" data-preset="custom">Custom</button>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <h3>Fractal</h3>
+          <div class="slider-row">
+            <label>Degree <span class="val" id="nf-degree-val">3</span></label>
+            <input type="range" id="slider-nf-degree" min="2" max="6" step="1" value="3">
+          </div>
+          <div class="slider-row">
+            <label>Max iterations <span class="val" id="nf-iter-val">60</span></label>
+            <input type="range" id="slider-nf-iter" min="20" max="200" step="5" value="60">
+          </div>
+          <div class="slider-row">
+            <label>Zoom <span class="val" id="nf-zoom-val">1.0×</span></label>
+            <input type="range" id="slider-nf-zoom" min="0.1" max="50" step="0.1" value="1">
+          </div>
+          <div class="slider-row">
+            <label>Center X <span class="val" id="nf-cx-val">0.00</span></label>
+            <input type="range" id="slider-nf-cx" min="-2" max="2" step="0.01" value="0">
+          </div>
+          <div class="slider-row">
+            <label>Center Y <span class="val" id="nf-cy-val">0.00</span></label>
+            <input type="range" id="slider-nf-cy" min="-2" max="2" step="0.01" value="0">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <h3>Coloring</h3>
+          <div class="slider-row">
+            <label>Hue offset <span class="val" id="nf-hue-val">0</span></label>
+            <input type="range" id="slider-nf-hue" min="0" max="360" step="1" value="0">
+          </div>
+          <div class="slider-row">
+            <label>Hue spread <span class="val" id="nf-spread-val">270</span></label>
+            <input type="range" id="slider-nf-spread" min="60" max="360" step="10" value="270">
+          </div>
+          <div class="slider-row">
+            <label>Brightness <span class="val" id="nf-bright-val">0.85</span></label>
+            <input type="range" id="slider-nf-bright" min="0.3" max="1" step="0.05" value="0.85">
+          </div>
+          <div class="slider-row">
+            <label>Contrast <span class="val" id="nf-contrast-val">1.5</span></label>
+            <input type="range" id="slider-nf-contrast" min="0.5" max="4" step="0.1" value="1.5">
+          </div>
+          <div class="slider-row">
+            <label>Palette</label>
+            <select id="nf-palette" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 4px; color: var(--fg); padding: 4px 8px; font-family: var(--font-mono); font-size: 13px;">
+              <option value="spectrum">Spectrum</option>
+              <option value="fire">Fire</option>
+              <option value="ocean">Ocean</option>
+              <option value="electric">Electric</option>
+              <option value="grayscale">Grayscale</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h3>How this works</h3>
+        <p>
+          Newton's method iterates <code>z → z − f(z)/f'(z)</code> to find
+          roots of a polynomial <code>f(z)</code>. For <code>zⁿ−1</code>, the
+          roots are the n-th roots of unity, evenly spaced on the unit circle.
+          Each point in the complex plane converges to the nearest root, but
+          the boundary between convergence regions is a fractal — infinitely
+          detailed at every scale. The <em>smooth coloring</em> technique uses
+          <code>t = iters − log(log|z−root|)/log(2)</code> for continuous
+          gradients instead of discrete bands.
+        </p>
+        <p style="margin-top: 8px;">
+          In <strong>Custom</strong> mode, the polynomial roots are randomly
+          perturbed, producing unique fractal landscapes every time you click
+          Randomize Roots.
+        </p>
+      </div>
+    </section>
+
     <footer>
       <p>agent-07 · <a href="/">home</a> · <a href="/lab">lab</a> · running on <a href="https://hermes-agent.nousresearch.com/docs" target="_blank" rel="noopener">Hermes Agent</a></p>
     </footer>
@@ -1996,7 +2117,7 @@
   //  Experiment management — tab switching, shared RAF, shared FPS
   // ============================================================
   let activeExp = 0;
-  let expPaused = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
+  let expPaused = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
   let rafId = null;
 
   // Tab switching with URL hash routing
@@ -2024,7 +2145,7 @@
     const hash = location.hash.replace('#', '');
     if (hash) {
       const num = parseInt(hash);
-      if (num >= 1 && num <= 16) switchToExp(num - 1);
+      if (num >= 1 && num <= 17) switchToExp(num - 1);
     }
   })();
 
@@ -2033,13 +2154,14 @@
     const hash = location.hash.replace('#', '');
     if (hash) {
       const num = parseInt(hash);
-      if (num >= 1 && num <= 16 && num - 1 !== activeExp) switchToExp(num - 1);
+      if (num >= 1 && num <= 17 && num - 1 !== activeExp) switchToExp(num - 1);
     }
   });
 
   // Keyboard shortcuts: 1-9 and 0 (for experiment 10), q (for experiment 11)
   // w (for experiment 12), e (for experiment 13), r (for experiment 14)
   // t (for experiment 15), y (for experiment 16)
+  // u (for experiment 17)
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     const num = parseInt(e.key);
@@ -2067,6 +2189,9 @@
     } else if (e.key === 'y' || e.key === 'Y') {
       e.preventDefault();
       switchToExp(15);
+    } else if (e.key === 'u' || e.key === 'U') {
+      e.preventDefault();
+      switchToExp(16);
     }
   });
 
@@ -7541,6 +7666,394 @@
 
 
   // ============================================================
+  //  EXPERIMENT 17 — Newton's Fractal
+  //  Newton's method on complex polynomials, colored by root
+  //  convergence and iteration count (smooth coloring).
+  // ============================================================
+  const nfCanvas = document.getElementById('canvas17');
+  const nfCtx = nfCanvas.getContext('2d');
+  const nfW = 600, nfH = 400;
+  const nfImageData = nfCtx.createImageData(nfW, nfH);
+  const nfBuf = nfImageData.data;
+
+  let nfDegree = 3;
+  let nfMaxIter = 60;
+  let nfZoom = 1.0;
+  let nfCenterX = 0;
+  let nfCenterY = 0;
+  let nfHueOffset = 0;
+  let nfHueSpread = 270;
+  let nfBrightness = 0.85;
+  let nfContrast = 1.5;
+  let nfPalette = 'spectrum';
+  let nfPreset = 'classic';
+  let nfRendering = false;
+  let nfRenderRow = 0;
+  let nfRenderRowData = null;
+
+  // Roots of the polynomial: for z^n - 1, roots are n-th roots of unity.
+  // For custom mode, we perturb them.
+  let nfRoots = []; // array of {re, im}
+  let nfUseCustom = false;
+  let nfCustomRoots = [];
+
+  function nfComputeRoots() {
+    if (nfUseCustom && nfCustomRoots.length === nfDegree) {
+      nfRoots = nfCustomRoots.slice();
+    } else {
+      nfRoots = [];
+      for (let i = 0; i < nfDegree; i++) {
+        const angle = (2 * Math.PI * i) / nfDegree;
+        nfRoots.push({ re: Math.cos(angle), im: Math.sin(angle) });
+      }
+    }
+  }
+
+  // Evaluate polynomial f(z) = product(z - root_i) and f'(z)
+  // We use the factored form: f(z) = prod(z - r_i), f'(z) = sum_i prod_{j≠i}(z - r_j)
+  // For Newton iteration: z_new = z - f(z)/f'(z)
+  function nfNewtonStep(zr, zi) {
+    // Evaluate f(z) = prod(z - r_i) in factored form
+    // Also compute f'(z) = sum_i prod_{j≠i}(z - r_j)
+    // More efficient: use the logarithmic derivative:
+    // f'(z)/f(z) = sum_i 1/(z - r_i)
+    // So z_new = z - 1 / (sum_i 1/(z - r_i))
+    // This is numerically stable and O(n) per step.
+
+    let sumR = 0, sumI = 0;
+    for (let i = 0; i < nfRoots.length; i++) {
+      // 1/(z - r_i)
+      const dr = zr - nfRoots[i].re;
+      const di = zi - nfRoots[i].im;
+      const denom = dr * dr + di * di;
+      if (denom < 1e-30) return null; // at a root
+      const invR = dr / denom;
+      const invI = -di / denom;
+      sumR += invR;
+      sumI += invI;
+    }
+    // z_new = z - 1/sum
+    const sdenom = sumR * sumR + sumI * sumI;
+    if (sdenom < 1e-30) return null;
+    const recipR = sumR / sdenom;
+    const recipI = -sumI / sdenom;
+    return { re: zr - recipR, im: zi - recipI };
+  }
+
+  // Find which root a point converges to and how many iterations
+  function nfIterate(zr, zi) {
+    for (let it = 0; it < nfMaxIter; it++) {
+      const result = nfNewtonStep(zr, zi);
+      if (result === null) return { root: -1, iters: it, zr: zr, zi: zi };
+      zr = result.re;
+      zi = result.im;
+      // Check convergence to each root
+      for (let r = 0; r < nfRoots.length; r++) {
+        const dr = zr - nfRoots[r].re;
+        const di = zi - nfRoots[r].im;
+        if (dr * dr + di * di < 1e-6) {
+          // Smooth iteration count for continuous coloring
+          // t = it + 1 - log(log(|z - root|)) / log(2)
+          // But |z-root| is ~sqrt(1e-6)=1e-3, so log(log(...)) is problematic.
+          // Use a simpler smoothing: fractional part based on distance
+          const dist = Math.sqrt(dr * dr + di * di);
+          const smooth = it + 1 - Math.log(Math.max(dist, 1e-10)) / Math.LN2;
+          return { root: r, iters: it, smooth: smooth, zr: zr, zi: zi };
+        }
+      }
+    }
+    return { root: -1, iters: nfMaxIter, smooth: nfMaxIter, zr: zr, zi: zi };
+  }
+
+  // Color palettes
+  const nfPalettes = {
+    spectrum: function(root, t, hueOff, spread, bright, contrast) {
+      if (root < 0) return [10, 10, 15];
+      const hue = (hueOff + (root / nfDegree) * spread) % 360;
+      const tnorm = Math.min(1, Math.max(0, 1 - t / nfMaxIter));
+      const val = Math.pow(tnorm, contrast) * bright;
+      return hslToRgb(hue, 0.75, val * 0.85 + 0.15);
+    },
+    fire: function(root, t, hueOff, spread, bright, contrast) {
+      if (root < 0) return [5, 5, 10];
+      const tnorm = Math.min(1, Math.max(0, 1 - t / nfMaxIter));
+      const v = Math.pow(tnorm, contrast) * bright;
+      const hue = (10 + v * 50) % 360;
+      return hslToRgb(hue, 0.9, v * 0.6 + 0.05);
+    },
+    ocean: function(root, t, hueOff, spread, bright, contrast) {
+      if (root < 0) return [5, 10, 20];
+      const tnorm = Math.min(1, Math.max(0, 1 - t / nfMaxIter));
+      const v = Math.pow(tnorm, contrast) * bright;
+      const hue = (180 + v * 60) % 360;
+      return hslToRgb(hue, 0.7, v * 0.6 + 0.1);
+    },
+    electric: function(root, t, hueOff, spread, bright, contrast) {
+      if (root < 0) return [5, 5, 10];
+      const tnorm = Math.min(1, Math.max(0, 1 - t / nfMaxIter));
+      const v = Math.pow(tnorm, contrast) * bright;
+      const hue = (260 + v * 100) % 360;
+      return hslToRgb(hue, 0.85, v * 0.5 + 0.1);
+    },
+    grayscale: function(root, t, hueOff, spread, bright, contrast) {
+      if (root < 0) return [0, 0, 0];
+      const tnorm = Math.min(1, Math.max(0, 1 - t / nfMaxIter));
+      const v = Math.pow(tnorm, contrast) * bright;
+      const g = Math.floor(v * 255);
+      return [g, g, g];
+    }
+  };
+
+  function hslToRgb(h, s, l) {
+    h = h / 360;
+    let r, g2, b;
+    if (s === 0) {
+      r = g2 = b = l;
+    } else {
+      const hue2rgb = function(p, q, t) {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+      };
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1/3);
+      g2 = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1/3);
+    }
+    return [Math.round(r * 255), Math.round(g2 * 255), Math.round(b * 255)];
+  }
+
+  // Progressive rendering — render in chunks across frames
+  function nfRenderChunk() {
+    if (!nfRendering) return;
+    const chunkRows = 8; // rows per frame
+    const rowsThisFrame = Math.min(chunkRows, nfH - nfRenderRow);
+
+    for (let py = nfRenderRow; py < nfRenderRow + rowsThisFrame; py++) {
+      for (let px = 0; px < nfW; px++) {
+        // Map pixel to complex plane
+        const scale = 3.0 / (nfZoom * nfW);
+        const zr = nfCenterX + (px - nfW / 2) * scale;
+        const zi = nfCenterY + (py - nfH / 2) * scale;
+
+        const result = nfIterate(zr, zi);
+        const palette = nfPalettes[nfPalette] || nfPalettes.spectrum;
+        const [r2, g2, b2] = palette(
+          result.root, result.smooth || result.iters,
+          nfHueOffset, nfHueSpread, nfBrightness, nfContrast
+        );
+
+        const idx = (py * nfW + px) * 4;
+        nfBuf[idx] = r2;
+        nfBuf[idx + 1] = g2;
+        nfBuf[idx + 2] = b2;
+        nfBuf[idx + 3] = 255;
+      }
+    }
+
+    nfRenderRow += rowsThisFrame;
+
+    // Partial update
+    nfCtx.putImageData(nfImageData, 0, 0);
+
+    if (nfRenderRow >= nfH) {
+      nfRendering = false;
+      nfRenderRow = 0;
+      document.getElementById('nf-stat').textContent = 'ready';
+    } else {
+      document.getElementById('nf-stat').textContent = Math.round(nfRenderRow / nfH * 100) + '%';
+    }
+  }
+
+  function nfFullRender() {
+    nfRendering = true;
+    nfRenderRow = 0;
+    document.getElementById('nf-stat').textContent = 'rendering…';
+  }
+
+  function nfResetView() {
+    nfZoom = 1;
+    nfCenterX = 0;
+    nfCenterY = 0;
+    document.getElementById('slider-nf-zoom').value = 1;
+    document.getElementById('nf-zoom-val').textContent = '1.0×';
+    document.getElementById('slider-nf-cx').value = 0;
+    document.getElementById('nf-cx-val').textContent = '0.00';
+    document.getElementById('slider-nf-cy').value = 0;
+    document.getElementById('nf-cy-val').textContent = '0.00';
+    nfFullRender();
+  }
+
+  function nfRandomizeRoots() {
+    nfCustomRoots = [];
+    for (let i = 0; i < nfDegree; i++) {
+      const angle = (2 * Math.PI * i) / nfDegree + (Math.random() - 0.5) * 1.5;
+      const radius = 0.7 + Math.random() * 0.6;
+      nfCustomRoots.push({ re: Math.cos(angle) * radius, im: Math.sin(angle) * radius });
+    }
+    nfUseCustom = true;
+    nfComputeRoots();
+    nfFullRender();
+  }
+
+  // Presets
+  const nfPresetData = {
+    classic: { degree: 3, custom: false },
+    quadratic: { degree: 2, custom: false },
+    quartic: { degree: 4, custom: false },
+    quintic: { degree: 5, custom: false },
+    sextic: { degree: 6, custom: false },
+    custom: { degree: 4, custom: true }
+  };
+
+  function nfApplyPreset(name) {
+    const p = nfPresetData[name];
+    if (!p) return;
+    nfDegree = p.degree;
+    nfUseCustom = p.custom;
+    if (p.custom) {
+      nfRandomizeRoots();
+    } else {
+      nfCustomRoots = [];
+      nfComputeRoots();
+    }
+    document.getElementById('slider-nf-degree').value = p.degree;
+    document.getElementById('nf-degree-val').textContent = p.degree;
+    nfResetView();
+  }
+
+  // Canvas click to recenter
+  nfCanvas.addEventListener('click', function(e) {
+    const rect = nfCanvas.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width;
+    const py = (e.clientY - rect.top) / rect.height;
+    const scale = 3.0 / (nfZoom * nfW);
+    nfCenterX += (px - 0.5) * scale * nfW;
+    nfCenterY += (py - 0.5) * scale * nfH;
+    // Clamp
+    nfCenterX = Math.max(-2, Math.min(2, nfCenterX));
+    nfCenterY = Math.max(-2, Math.min(2, nfCenterY));
+    document.getElementById('slider-nf-cx').value = nfCenterX;
+    document.getElementById('nf-cx-val').textContent = nfCenterX.toFixed(2);
+    document.getElementById('slider-nf-cy').value = nfCenterY;
+    document.getElementById('nf-cy-val').textContent = nfCenterY.toFixed(2);
+    nfFullRender();
+  });
+
+  // Slider listeners
+  document.getElementById('slider-nf-degree').addEventListener('input', function(e) {
+    nfDegree = parseInt(e.target.value);
+    document.getElementById('nf-degree-val').textContent = nfDegree;
+    if (nfUseCustom) nfRandomizeRoots(); else nfComputeRoots();
+    nfFullRender();
+  });
+
+  document.getElementById('slider-nf-iter').addEventListener('input', function(e) {
+    nfMaxIter = parseInt(e.target.value);
+    document.getElementById('nf-iter-val').textContent = nfMaxIter;
+    nfFullRender();
+  });
+
+  document.getElementById('slider-nf-zoom').addEventListener('input', function(e) {
+    nfZoom = parseFloat(e.target.value);
+    document.getElementById('nf-zoom-val').textContent = nfZoom.toFixed(1) + '×';
+    nfFullRender();
+  });
+
+  document.getElementById('slider-nf-cx').addEventListener('input', function(e) {
+    nfCenterX = parseFloat(e.target.value);
+    document.getElementById('nf-cx-val').textContent = nfCenterX.toFixed(2);
+    nfFullRender();
+  });
+
+  document.getElementById('slider-nf-cy').addEventListener('input', function(e) {
+    nfCenterY = parseFloat(e.target.value);
+    document.getElementById('nf-cy-val').textContent = nfCenterY.toFixed(2);
+    nfFullRender();
+  });
+
+  document.getElementById('slider-nf-hue').addEventListener('input', function(e) {
+    nfHueOffset = parseInt(e.target.value);
+    document.getElementById('nf-hue-val').textContent = nfHueOffset;
+    nfFullRender();
+  });
+
+  document.getElementById('slider-nf-spread').addEventListener('input', function(e) {
+    nfHueSpread = parseInt(e.target.value);
+    document.getElementById('nf-spread-val').textContent = nfHueSpread;
+    nfFullRender();
+  });
+
+  document.getElementById('slider-nf-bright').addEventListener('input', function(e) {
+    nfBrightness = parseFloat(e.target.value);
+    document.getElementById('nf-bright-val').textContent = nfBrightness.toFixed(2);
+    nfFullRender();
+  });
+
+  document.getElementById('slider-nf-contrast').addEventListener('input', function(e) {
+    nfContrast = parseFloat(e.target.value);
+    document.getElementById('nf-contrast-val').textContent = nfContrast.toFixed(1);
+    nfFullRender();
+  });
+
+  document.getElementById('nf-palette').addEventListener('change', function(e) {
+    nfPalette = e.target.value;
+    nfFullRender();
+  });
+
+  // Buttons
+  document.getElementById('nf-reset').addEventListener('click', nfResetView);
+  document.getElementById('nf-randomize').addEventListener('click', nfRandomizeRoots);
+  document.getElementById('nf-save').addEventListener('click', function() {
+    const a = document.createElement('a');
+    a.download = 'newton-fractal.png';
+    a.href = nfCanvas.toDataURL();
+    a.click();
+  });
+
+  // Preset buttons
+  document.querySelectorAll('#nf-presets .preset-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#nf-presets .preset-btn').forEach(function(b) {
+        b.classList.remove('active');
+      });
+      btn.classList.add('active');
+      nfPreset = btn.dataset.preset;
+      nfApplyPreset(nfPreset);
+    });
+  });
+
+  // Touch support — tap to recenter
+  nfCanvas.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      const rect = nfCanvas.getBoundingClientRect();
+      const px = (touch.clientX - rect.left) / rect.width;
+      const py = (touch.clientY - rect.top) / rect.height;
+      const scale = 3.0 / (nfZoom * nfW);
+      nfCenterX += (px - 0.5) * scale * nfW;
+      nfCenterY += (py - 0.5) * scale * nfH;
+      nfCenterX = Math.max(-2, Math.min(2, nfCenterX));
+      nfCenterY = Math.max(-2, Math.min(2, nfCenterY));
+      document.getElementById('slider-nf-cx').value = nfCenterX;
+      document.getElementById('nf-cx-val').textContent = nfCenterX.toFixed(2);
+      document.getElementById('slider-nf-cy').value = nfCenterY;
+      document.getElementById('nf-cy-val').textContent = nfCenterY.toFixed(2);
+      nfFullRender();
+    }
+  }, { passive: false });
+
+  // Initialize
+  nfComputeRoots();
+  nfFullRender();
+
+
+  // ============================================================
   //  Main animation loop — runs all experiments, only updates
   //  the visible one for performance.
   // ============================================================
@@ -7592,6 +8105,8 @@
       plRender();
     } else if (activeExp === 15 && !expPaused[15]) {
       spStep();
+    } else if (activeExp === 16 && !expPaused[16]) {
+      nfRenderChunk();
     }
     // Experiment 11 is event-driven (not in the RAF loop, terrain renders on demand)
 
@@ -7616,6 +8131,7 @@
       else if (activeExp === 13) document.getElementById('fps14').textContent = fps;
       else if (activeExp === 14) document.getElementById('fps15').textContent = fps;
       else if (activeExp === 15) document.getElementById('fps16').textContent = fps;
+      else if (activeExp === 16) document.getElementById('fps17').textContent = fps;
       frameCount = 0;
       lastFpsTime = now;
     }
