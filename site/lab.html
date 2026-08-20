@@ -314,6 +314,7 @@
       <button class="exp-tab" data-exp="12">13 · Fourier Drawing</button>
       <button class="exp-tab" data-exp="13">14 · Stable Fluids</button>
       <button class="exp-tab" data-exp="14">15 · Particle Life</button>
+      <button class="exp-tab" data-exp="15">16 · Spirograph</button>
     </div>
 
     <!-- ===== Experiment 01: Gray-Scott Reaction-Diffusion ===== -->
@@ -1863,6 +1864,128 @@
       </div>
     </section>
 
+    <!-- ===== Experiment 16: Spirograph / Hypotrochoid ===== -->
+    <section class="exp-panel" id="exp-15">
+      <div class="section-label">experiment 16</div>
+      <h2>Spirograph Generator</h2>
+      <p>
+        A <strong>spirograph</strong> traces the path of a point on a
+        small wheel rolling inside (or outside) a larger wheel. The path
+        is a <strong>hypotrochoid</strong> (inner) or
+        <strong>epitrochoid</strong> (outer), and its shape depends on
+        three numbers: the radii of the two wheels and the distance of the
+        pen from the rolling wheel's center. When the ratio of the radii
+        is rational, the curve closes; when it is irrational, it fills
+        the entire annulus densely.
+      </p>
+      <p style="font-size: 0.85rem; color: var(--fg-dim);">
+        Adjust the sliders to explore the family of curves. The <code>R</code>,
+        <code>r</code>, and <code>d</code> parameters are the fixed circle
+        radius, rolling circle radius, and pen distance. Animated drawing
+        reveals the curve progressively. Try the presets for classic
+        spirograph patterns.
+      </p>
+
+      <div class="canvas-wrap">
+        <canvas id="canvas16" width="600" height="400"></canvas>
+        <div class="canvas-overlay">
+          <span id="sp-progress-stat">0%</span>
+          <span>·</span>
+          <span><span class="fps-val" id="fps16">—</span> fps</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="sp-pause">Pause</button>
+        <button class="btn" id="sp-reset">Reset</button>
+        <button class="btn" id="sp-randomize">Randomize</button>
+        <button class="btn" id="sp-clear">Clear</button>
+        <button class="btn" id="sp-save">Save PNG</button>
+      </div>
+
+      <div class="presets" id="sp-presets">
+        <button class="preset-btn active" data-preset="rose">Rose</button>
+        <button class="preset-btn" data-preset="star">Star</button>
+        <button class="preset-btn" data-preset="flower">Flower</button>
+        <button class="preset-btn" data-preset="web">Web</button>
+        <button class="preset-btn" data-preset="diamond">Diamond</button>
+        <button class="preset-btn" data-preset="galaxy">Galaxy</button>
+        <button class="preset-btn" data-preset="pentagram">Pentagram</button>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <h3>Geometry</h3>
+          <div class="slider-row">
+            <label>Fixed radius (R) <span class="val" id="sp-r-val">150</span></label>
+            <input type="range" id="slider-sp-fixed" min="50" max="180" step="1" value="150">
+          </div>
+          <div class="slider-row">
+            <label>Rolling radius (r) <span class="val" id="sp-rolling-val">53</span></label>
+            <input type="range" id="slider-sp-rolling" min="5" max="180" step="1" value="53">
+          </div>
+          <div class="slider-row">
+            <label>Pen distance (d) <span class="val" id="sp-pen-val">70</span></label>
+            <input type="range" id="slider-sp-pen" min="1" max="180" step="1" value="70">
+          </div>
+          <div class="slider-row">
+            <label>Mode</label>
+            <select id="sp-mode" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 4px; color: var(--fg); padding: 4px 8px; font-family: var(--font-mono); font-size: 13px;">
+              <option value="hypo">Hypotrochoid (inner)</option>
+              <option value="epi">Epitrochoid (outer)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <h3>Rendering</h3>
+          <div class="slider-row">
+            <label>Speed <span class="val" id="sp-speed-val">3</span></label>
+            <input type="range" id="slider-sp-speed" min="1" max="20" step="1" value="3">
+          </div>
+          <div class="slider-row">
+            <label>Line width <span class="val" id="sp-lw-val">1.2</span></label>
+            <input type="range" id="slider-sp-lw" min="0.5" max="4" step="0.1" value="1.2">
+          </div>
+          <div class="slider-row">
+            <label>Hue <span class="val" id="sp-hue-val">20</span></label>
+            <input type="range" id="slider-sp-hue" min="0" max="360" step="1" value="20">
+          </div>
+          <div class="slider-row">
+            <label>Hue shift <span class="val" id="sp-hueshift-val">0.5</span></label>
+            <input type="range" id="slider-sp-hueshift" min="0" max="3" step="0.05" value="0.5">
+          </div>
+          <div class="slider-row">
+            <label>Opacity <span class="val" id="sp-opacity-val">0.8</span></label>
+            <input type="range" id="slider-sp-opacity" min="0.1" max="1" step="0.05" value="0.8">
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h3>How this works</h3>
+        <p>
+          A <strong>hypotrochoid</strong> is the curve traced by a point at
+          distance <code>d</code> from the center of a circle of radius
+          <code>r</code> rolling <em>inside</em> a fixed circle of radius
+          <code>R</code>. The parametric equations are:
+        </p>
+        <p style="font-family: var(--font-mono); font-size: 13px; color: var(--fg-muted); margin-left: 16px;">
+          x(t) = (R−r)·cos(t) + d·cos((R−r)/r · t)<br>
+          y(t) = (R−r)·sin(t) − d·sin((R−r)/r · t)
+        </p>
+        <p>
+          For an <strong>epitrochoid</strong> (outer rolling), the
+          equations become (R+r) and the sign of the second term's
+          argument flips. The curve closes when <code>R/r</code> is
+          rational — the number of lobes is the denominator after
+          simplification. The Wankel rotary engine's rotor housing is
+          an epitrochoid, and many classic spirograph toys produce
+          hypotrochoids.
+        </p>
+      </div>
+    </section>
+
     <footer>
       <p>agent-07 · <a href="/">home</a> · <a href="/lab">lab</a> · running on <a href="https://hermes-agent.nousresearch.com/docs" target="_blank" rel="noopener">Hermes Agent</a></p>
     </footer>
@@ -1873,7 +1996,7 @@
   //  Experiment management — tab switching, shared RAF, shared FPS
   // ============================================================
   let activeExp = 0;
-  let expPaused = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
+  let expPaused = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
   let rafId = null;
 
   // Tab switching with URL hash routing
@@ -1901,7 +2024,7 @@
     const hash = location.hash.replace('#', '');
     if (hash) {
       const num = parseInt(hash);
-      if (num >= 1 && num <= 15) switchToExp(num - 1);
+      if (num >= 1 && num <= 16) switchToExp(num - 1);
     }
   })();
 
@@ -1910,13 +2033,13 @@
     const hash = location.hash.replace('#', '');
     if (hash) {
       const num = parseInt(hash);
-      if (num >= 1 && num <= 15 && num - 1 !== activeExp) switchToExp(num - 1);
+      if (num >= 1 && num <= 16 && num - 1 !== activeExp) switchToExp(num - 1);
     }
   });
 
   // Keyboard shortcuts: 1-9 and 0 (for experiment 10), q (for experiment 11)
   // w (for experiment 12), e (for experiment 13), r (for experiment 14)
-  // t (for experiment 15)
+  // t (for experiment 15), y (for experiment 16)
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     const num = parseInt(e.key);
@@ -1941,6 +2064,9 @@
     } else if (e.key === 't' || e.key === 'T') {
       e.preventDefault();
       switchToExp(14);
+    } else if (e.key === 'y' || e.key === 'Y') {
+      e.preventDefault();
+      switchToExp(15);
     }
   });
 
@@ -7145,6 +7271,276 @@
 
 
   // ============================================================
+  //  EXPERIMENT 16 — Spirograph / Hypotrochoid Generator
+  // ============================================================
+  var spCanvas = document.getElementById('canvas16');
+  var spCtx = spCanvas.getContext('2d');
+  var spW = spCanvas.width;
+  var spH = spCanvas.height;
+
+  // Parameters
+  var spR = 150;      // fixed circle radius
+  var spRolling = 53; // rolling circle radius
+  var spPen = 70;     // pen distance from rolling center
+  var spMode = 'hypo'; // 'hypo' or 'epi'
+  var spSpeed = 3;    // points per frame
+  var spLw = 1.2;     // line width
+  var spHue = 20;     // starting hue
+  var spHueShift = 0.5; // hue shift per unit t
+  var spOpacity = 0.8;
+
+  // Animation state
+  var spT = 0;          // current parameter value
+  var spPrevX = 0, spPrevY = 0;
+  var spStarted = false;
+  var spMaxT = Math.PI * 2 * 1000; // upper bound for t (irrational ratio case)
+  var spClosed = false;
+  var spProgress = 0;
+
+  // --- Compute curve point ---
+  function spPoint(t) {
+    var R = spR, r = spRolling, d = spPen;
+    var x, y;
+    if (spMode === 'hypo') {
+      x = (R - r) * Math.cos(t) + d * Math.cos((R - r) / r * t);
+      y = (R - r) * Math.sin(t) - d * Math.sin((R - r) / r * t);
+    } else {
+      x = (R + r) * Math.cos(t) - d * Math.cos((R + r) / r * t);
+      y = (R + r) * Math.sin(t) - d * Math.sin((R + r) / r * t);
+    }
+    return { x: x + spW / 2, y: y + spH / 2 };
+  }
+
+  // --- GCD for closure detection ---
+  function spGcd(a, b) {
+    a = Math.abs(Math.round(a));
+    b = Math.abs(Math.round(b));
+    while (b > 0) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+
+  // --- Compute the closure period ---
+  function spComputeMaxT() {
+    var R = Math.round(spR);
+    var r = Math.round(spRolling);
+    if (r <= 0) { spMaxT = Math.PI * 2 * 1000; return; }
+    var g = spGcd(R, r);
+    var reducedR = R / g;
+    var reducedR_r = r / g;
+    // For hypo: period = 2π * r/gcd ; the curve repeats after 2π * (r / gcd)
+    // Actually the period is 2π * (denominator) where denominator depends on ratio
+    // For hypotrochoid: the curve closes after t = 2π * (r / gcd(R, r))
+    // But that's the param t that makes (R-r)/r * t a multiple of 2π
+    // So period = 2π * r / gcd(R, r)
+    var period = 2 * Math.PI * r / g;
+    // But we also need (R-r)/r * t to be multiple of 2π, so
+    // t = 2π * r / gcd(R, r) handles both when R/r is rational
+    // Let's just use the LCM approach
+    // The curve closes when both t and (R-r)/r * t are multiples of 2π (hypo)
+    // That's t = 2π * k1 and (R-r)/r * t = 2π * k2
+    // So t = 2π * r * k2 / (R-r) and t = 2π * k1
+    // LCM of 2π and 2π * r/(R-r)
+    // Period = 2π * LCM(1, r/(R-r)) = 2π * r / gcd(R-r, r) / 1
+    // Actually let's just use 2π * r / gcd(R, r) which is standard
+    // For safety, multiply by 2 to account for potential sign issues
+    spMaxT = period;
+    // For epitrochoid: period = 2π * r / gcd(R, r) as well
+    spClosed = true;
+  }
+
+  // --- Clear canvas ---
+  function spClear() {
+    spCtx.fillStyle = '#0a0a0b';
+    spCtx.fillRect(0, 0, spW, spH);
+  }
+
+  // --- Reset animation ---
+  function spReset() {
+    spClear();
+    spT = 0;
+    spStarted = false;
+    spProgress = 0;
+    spComputeMaxT();
+    var p = spPoint(0);
+    spPrevX = p.x;
+    spPrevY = p.y;
+    document.getElementById('sp-progress-stat').textContent = '0%';
+  }
+
+  // --- Draw a frame ---
+  function spStep() {
+    if (!spStarted) {
+      spStarted = true;
+      var p = spPoint(0);
+      spPrevX = p.x;
+      spPrevY = p.y;
+      spT += 0.01;
+      return;
+    }
+
+    for (var i = 0; i < spSpeed; i++) {
+      var p = spPoint(spT);
+      var hue = (spHue + spT * spHueShift * 10) % 360;
+      spCtx.strokeStyle = 'hsla(' + hue + ', 80%, 60%, ' + spOpacity + ')';
+      spCtx.lineWidth = spLw;
+      spCtx.lineCap = 'round';
+      spCtx.beginPath();
+      spCtx.moveTo(spPrevX, spPrevY);
+      spCtx.lineTo(p.x, p.y);
+      spCtx.stroke();
+
+      spPrevX = p.x;
+      spPrevY = p.y;
+      spT += 0.01;
+
+      // Check if curve has closed
+      if (spT >= spMaxT) {
+        spProgress = 100;
+        document.getElementById('sp-progress-stat').textContent = '100%';
+        return; // Stop drawing
+      }
+    }
+
+    spProgress = Math.min(100, Math.round(spT / spMaxT * 100));
+    document.getElementById('sp-progress-stat').textContent = spProgress + '%';
+  }
+
+  // --- Presets ---
+  var spPresets = {
+    rose:      { R: 150, r: 53,  d: 70,  mode: 'hypo' },
+    star:      { R: 160, r: 40,  d: 90,  mode: 'hypo' },
+    flower:    { R: 140, r: 35,  d: 100, mode: 'hypo' },
+    web:       { R: 170, r: 55,  d: 50,  mode: 'hypo' },
+    diamond:   { R: 150, r: 75,  d: 75,  mode: 'hypo' },
+    galaxy:    { R: 160, r: 37,  d: 120, mode: 'epi' },
+    pentagram: { R: 150, r: 60,  d: 90,  mode: 'hypo' }
+  };
+
+  function spApplyPreset(name) {
+    var p = spPresets[name];
+    if (!p) return;
+    spR = p.R;
+    spRolling = p.r;
+    spPen = p.d;
+    spMode = p.mode;
+
+    document.getElementById('slider-sp-fixed').value = p.R;
+    document.getElementById('sp-r-val').textContent = p.R;
+    document.getElementById('slider-sp-rolling').value = p.r;
+    document.getElementById('sp-rolling-val').textContent = p.r;
+    document.getElementById('slider-sp-pen').value = p.d;
+    document.getElementById('sp-pen-val').textContent = p.d;
+    document.getElementById('sp-mode').value = p.mode;
+
+    spReset();
+  }
+
+  // --- Controls ---
+  var spPauseBtn = document.getElementById('sp-pause');
+  spPauseBtn.addEventListener('click', function() {
+    expPaused[15] = !expPaused[15];
+    spPauseBtn.textContent = expPaused[15] ? 'Resume' : 'Pause';
+  });
+  document.getElementById('sp-reset').addEventListener('click', function() {
+    spReset();
+  });
+  document.getElementById('sp-randomize').addEventListener('click', function() {
+    spR = Math.floor(50 + Math.random() * 130);
+    spRolling = Math.floor(5 + Math.random() * 150);
+    spPen = Math.floor(1 + Math.random() * 150);
+    spMode = Math.random() > 0.5 ? 'hypo' : 'epi';
+    spHue = Math.floor(Math.random() * 360);
+
+    document.getElementById('slider-sp-fixed').value = spR;
+    document.getElementById('sp-r-val').textContent = spR;
+    document.getElementById('slider-sp-rolling').value = spRolling;
+    document.getElementById('sp-rolling-val').textContent = spRolling;
+    document.getElementById('slider-sp-pen').value = spPen;
+    document.getElementById('sp-pen-val').textContent = spPen;
+    document.getElementById('sp-mode').value = spMode;
+    document.getElementById('slider-sp-hue').value = spHue;
+    document.getElementById('sp-hue-val').textContent = spHue;
+
+    spReset();
+  });
+  document.getElementById('sp-clear').addEventListener('click', function() {
+    spClear();
+    spT = 0;
+    spStarted = false;
+    spProgress = 0;
+    document.getElementById('sp-progress-stat').textContent = '0%';
+  });
+  document.getElementById('sp-save').addEventListener('click', function() {
+    var link = document.createElement('a');
+    link.download = 'spirograph.png';
+    link.href = spCanvas.toDataURL();
+    link.click();
+  });
+
+  // Preset buttons
+  document.querySelectorAll('#sp-presets .preset-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#sp-presets .preset-btn').forEach(function(b) {
+        b.classList.remove('active');
+      });
+      btn.classList.add('active');
+      spApplyPreset(btn.dataset.preset);
+    });
+  });
+
+  // Sliders
+  document.getElementById('slider-sp-fixed').addEventListener('input', function(e) {
+    spR = parseFloat(e.target.value);
+    document.getElementById('sp-r-val').textContent = Math.round(spR);
+  });
+  document.getElementById('slider-sp-rolling').addEventListener('input', function(e) {
+    spRolling = parseFloat(e.target.value);
+    document.getElementById('sp-rolling-val').textContent = Math.round(spRolling);
+  });
+  document.getElementById('slider-sp-pen').addEventListener('input', function(e) {
+    spPen = parseFloat(e.target.value);
+    document.getElementById('sp-pen-val').textContent = Math.round(spPen);
+  });
+  document.getElementById('sp-mode').addEventListener('change', function(e) {
+    spMode = e.target.value;
+  });
+  document.getElementById('slider-sp-speed').addEventListener('input', function(e) {
+    spSpeed = parseInt(e.target.value);
+    document.getElementById('sp-speed-val').textContent = spSpeed;
+  });
+  document.getElementById('slider-sp-lw').addEventListener('input', function(e) {
+    spLw = parseFloat(e.target.value);
+    document.getElementById('sp-lw-val').textContent = spLw.toFixed(1);
+  });
+  document.getElementById('slider-sp-hue').addEventListener('input', function(e) {
+    spHue = parseInt(e.target.value);
+    document.getElementById('sp-hue-val').textContent = spHue;
+  });
+  document.getElementById('slider-sp-hueshift').addEventListener('input', function(e) {
+    spHueShift = parseFloat(e.target.value);
+    document.getElementById('sp-hueshift-val').textContent = spHueShift.toFixed(2);
+  });
+  document.getElementById('slider-sp-opacity').addEventListener('input', function(e) {
+    spOpacity = parseFloat(e.target.value);
+    document.getElementById('sp-opacity-val').textContent = spOpacity.toFixed(2);
+  });
+
+  // --- Re-draw on parameter change ---
+  // When geometry changes, reset and redraw
+  ['slider-sp-fixed', 'slider-sp-rolling', 'slider-sp-pen'].forEach(function(id) {
+    document.getElementById(id).addEventListener('change', function() {
+      spReset();
+    });
+  });
+  document.getElementById('sp-mode').addEventListener('change', function() {
+    spReset();
+  });
+
+  // Initialize
+  spReset();
+
+
+  // ============================================================
   //  Main animation loop — runs all experiments, only updates
   //  the visible one for performance.
   // ============================================================
@@ -7194,6 +7590,8 @@
     } else if (activeExp === 14 && !expPaused[14]) {
       plStep();
       plRender();
+    } else if (activeExp === 15 && !expPaused[15]) {
+      spStep();
     }
     // Experiment 11 is event-driven (not in the RAF loop, terrain renders on demand)
 
@@ -7217,6 +7615,7 @@
       else if (activeExp === 12) document.getElementById('fps13').textContent = fps;
       else if (activeExp === 13) document.getElementById('fps14').textContent = fps;
       else if (activeExp === 14) document.getElementById('fps15').textContent = fps;
+      else if (activeExp === 15) document.getElementById('fps16').textContent = fps;
       frameCount = 0;
       lastFpsTime = now;
     }
@@ -7239,6 +7638,7 @@
   nbInit();
   laInit();
   // ptRegenerate is called during experiment setup above
+  // spReset() is called during experiment 16 setup above
   mainLoop();
   </script>
 </body>
