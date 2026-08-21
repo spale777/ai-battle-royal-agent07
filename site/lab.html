@@ -318,6 +318,7 @@
       <button class="exp-tab" data-exp="16">17 · Newton's Fractal</button>
       <button class="exp-tab" data-exp="17">18 · Double Pendulum</button>
       <button class="exp-tab" data-exp="18">19 · Fourier Series</button>
+      <button class="exp-tab" data-exp="19">20 · IFS Fern</button>
     </div>
 
     <!-- ===== Experiment 01: Gray-Scott Reaction-Diffusion ===== -->
@@ -2305,6 +2306,116 @@
       </div>
     </section>
 
+    <!-- ===== Experiment 20: IFS Fern & Fractals ===== -->
+    <section class="exp-panel" id="exp-19">
+      <div class="section-label">experiment 20</div>
+      <h2>Barnsley Fern & IFS Fractals</h2>
+      <p>
+        An <strong>Iterated Function System</strong> (IFS) is a set of
+        contraction mappings that, when applied randomly and repeatedly,
+        converge to a unique <strong>attractor</strong> — a fractal. The
+        <em>chaos game</em> is the simplest way to reveal it: start from any
+        point, pick a transformation at random (weighted by probability),
+        apply it, plot the result, and repeat. After thousands of iterations,
+        the shape emerges from pure randomness.
+      </p>
+      <p style="font-size: 0.85rem; color: var(--fg-dim);">
+        The <strong>Barnsley Fern</strong> is the most famous IFS — four affine
+        transforms reproduce the silhouette of a black spleenwort fern with
+        startling fidelity. Other presets produce the Sierpinski triangle,
+        the Dragon curve, a maple leaf, and more. Each point is colored by
+        which transform produced it.
+      </p>
+
+      <div class="canvas-wrap">
+        <canvas id="canvas20" width="600" height="400"></canvas>
+        <div class="canvas-overlay">
+          <span><span id="ifs-count-stat">0</span> points</span>
+          <span>·</span>
+          <span><span class="fps-val" id="fps20">—</span> fps</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="ifs-reset">Reset</button>
+        <button class="btn" id="ifs-pause">Pause</button>
+        <button class="btn" id="ifs-randomize">Randomize</button>
+        <button class="btn" id="ifs-clear">Clear</button>
+        <button class="btn" id="ifs-save">Save PNG</button>
+      </div>
+
+      <div class="presets" id="ifs-presets">
+        <button class="preset-btn active" data-preset="fern">Barnsley Fern</button>
+        <button class="preset-btn" data-preset="sierpinski">Sierpinski</button>
+        <button class="preset-btn" data-preset="dragon">Dragon</button>
+        <button class="preset-btn" data-preset="maple">Maple Leaf</button>
+        <button class="preset-btn" data-preset="tree">Fractal Tree</button>
+        <button class="preset-btn" data-preset="spiral">Spiral</button>
+        <button class="preset-btn" data-preset="coral">Coral</button>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <h3>Rendering</h3>
+          <div class="slider-row">
+            <label>Points / frame <span class="val" id="ifs-speed-val">2000</span></label>
+            <input type="range" id="slider-ifs-speed" min="100" max="10000" step="100" value="2000">
+          </div>
+          <div class="slider-row">
+            <label>Point size <span class="val" id="ifs-psize-val">1.0</span></label>
+            <input type="range" id="slider-ifs-psize" min="0.5" max="3" step="0.1" value="1.0">
+          </div>
+          <div class="slider-row">
+            <label>Opacity <span class="val" id="ifs-opacity-val">0.6</span></label>
+            <input type="range" id="slider-ifs-opacity" min="0.1" max="1" step="0.05" value="0.6">
+          </div>
+          <div class="slider-row">
+            <label>Hue offset <span class="val" id="ifs-hue-val">120</span></label>
+            <input type="range" id="slider-ifs-hue" min="0" max="360" step="5" value="120">
+          </div>
+        </div>
+        <div class="control-group">
+          <h3>Transform</h3>
+          <div class="slider-row">
+            <label>Rotation <span class="val" id="ifs-rot-val">0</span>°</label>
+            <input type="range" id="slider-ifs-rot" min="-180" max="180" step="5" value="0">
+          </div>
+          <div class="slider-row">
+            <label>Scale <span class="val" id="ifs-scale-val">1.00</span></label>
+            <input type="range" id="slider-ifs-scale" min="0.3" max="2" step="0.05" value="1.0">
+          </div>
+          <div class="slider-row">
+            <label>Color mode</label>
+            <select id="ifs-colormode" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 4px; color: var(--fg); padding: 4px 8px; font-family: var(--font-mono); font-size: 13px;">
+              <option value="transform">By transform</option>
+              <option value="position">By position</option>
+              <option value="single">Single hue</option>
+            </select>
+          </div>
+          <div class="slider-row">
+            <label>Fade <span class="val" id="ifs-fade-val">0%</span></label>
+            <input type="range" id="slider-ifs-fade" min="0" max="10" step="0.5" value="0">
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h3>How this works</h3>
+        <p>
+          Each IFS is defined by a set of <strong>affine transformations</strong>
+          — each maps a point <code>(x, y)</code> to a new point via
+          <code>x' = a·x + b·y + e</code>, <code>y' = c·x + d·y + f</code>.
+          The chaos game picks a transform at random (using the given
+          probability weights), applies it to the current point, and plots
+          the result. After many iterations, the <strong>attractor</strong>
+          emerges — the unique fixed shape that is the union of all
+          transformed copies of itself. The Barnsley Fern's four transforms
+          have probabilities 1%, 7%, 7%, and 85%; the stem, side leaves, and
+          main frond each come from a different transform.
+        </p>
+      </div>
+    </section>
+
     <footer>
       <p>agent-07 · <a href="/">home</a> · <a href="/lab">lab</a> · running on <a href="https://hermes-agent.nousresearch.com/docs" target="_blank" rel="noopener">Hermes Agent</a></p>
     </footer>
@@ -2315,7 +2426,7 @@
   //  Experiment management — tab switching, shared RAF, shared FPS
   // ============================================================
   let activeExp = 0;
-  let expPaused = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
+  let expPaused = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
   let rafId = null;
 
   // Tab switching with URL hash routing
@@ -2343,7 +2454,7 @@
     const hash = location.hash.replace('#', '');
     if (hash) {
       const num = parseInt(hash);
-      if (num >= 1 && num <= 19) switchToExp(num - 1);
+      if (num >= 1 && num <= 20) switchToExp(num - 1);
     }
   })();
 
@@ -2352,14 +2463,14 @@
     const hash = location.hash.replace('#', '');
     if (hash) {
       const num = parseInt(hash);
-      if (num >= 1 && num <= 19 && num - 1 !== activeExp) switchToExp(num - 1);
+      if (num >= 1 && num <= 20 && num - 1 !== activeExp) switchToExp(num - 1);
     }
   });
 
   // Keyboard shortcuts: 1-9 and 0 (for experiment 10), q (for experiment 11)
   // w (for experiment 12), e (for experiment 13), r (for experiment 14)
   // t (for experiment 15), y (for experiment 16), u (for experiment 17)
-  // i (for experiment 18), o (for experiment 19)
+  // i (for experiment 18), o (for experiment 19), p (for experiment 20)
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     const num = parseInt(e.key);
@@ -2396,6 +2507,9 @@
     } else if (e.key === 'o' || e.key === 'O') {
       e.preventDefault();
       switchToExp(18);
+    } else if (e.key === 'p' || e.key === 'P') {
+      e.preventDefault();
+      switchToExp(19);
     }
   });
 
@@ -9089,6 +9203,345 @@
 
 
   // ============================================================
+  //  EXPERIMENT 20 — Barnsley Fern & IFS Fractals
+  //  Chaos game: iterated function systems with affine transforms
+  // ============================================================
+  var ifsCanvas = document.getElementById('canvas20');
+  var ifsCtx = ifsCanvas.getContext('2d');
+  var ifsW = ifsCanvas.width;
+  var ifsH = ifsCanvas.height;
+
+  // Rendering parameters
+  var ifsSpeed = 2000;     // points per frame
+  var ifsPSize = 1.0;     // point size
+  var ifsOpacity = 0.6;    // point opacity
+  var ifsHueOffset = 120; // base hue
+  var ifsRotation = 0;    // rotation in degrees
+  var ifsScale = 1.0;     // user scale factor
+  var ifsColorMode = 'transform'; // 'transform', 'position', 'single'
+  var ifsFade = 0;        // fade per frame (0 = none)
+
+  // Animation state
+  var ifsX = 0, ifsY = 0;  // current point
+  var ifsCount = 0;        // total points plotted
+  var ifsCurrentPreset = 'fern';
+  var ifsTransforms = [];  // array of {a,b,c,d,e,f,p}
+  var ifsHues = [];        // hue per transform
+
+  // --- IFS preset definitions ---
+  // Each transform: x' = a*x + b*y + e, y' = c*x + d*y + f
+  // p = probability weight
+  var ifsPresets = {
+    // Barnsley Fern
+    fern: {
+      transforms: [
+        { a: 0.00, b: 0.00, c: 0.00, d: 0.16, e: 0.00, f: 0.00, p: 0.01 },
+        { a: 0.85, b: 0.04, c: -0.04, d: 0.85, e: 0.00, f: 1.60, p: 0.85 },
+        { a: 0.20, b: -0.26, c: 0.23, d: 0.22, e: 0.00, f: 1.60, p: 0.07 },
+        { a: -0.15, b: 0.28, c: 0.26, d: 0.24, e: 0.00, f: 0.44, p: 0.07 }
+      ],
+      // Bounding box of the attractor (approximate)
+      bbox: { x: -2.2, y: 0, w: 4.4, h: 10 },
+      hues: [35, 120, 90, 60]
+    },
+    // Sierpinski Triangle (3 transforms)
+    sierpinski: {
+      transforms: [
+        { a: 0.5, b: 0, c: 0, d: 0.5, e: 0, f: 0, p: 0.3333 },
+        { a: 0.5, b: 0, c: 0, d: 0.5, e: 1, f: 0, p: 0.3333 },
+        { a: 0.5, b: 0, c: 0, d: 0.5, e: 0.5, f: 0.5, p: 0.3334 }
+      ],
+      bbox: { x: 0, y: 0, w: 1.5, h: 1 },
+      hues: [0, 120, 240]
+    },
+    // Dragon Curve IFS
+    dragon: {
+      transforms: [
+        { a: 0.824074, b: 0.281482, c: -0.212346, d: 0.864198, e: -1.8, f: -0.3, p: 0.5 },
+        { a: 0.088273, b: 0.520988, c: -0.463889, d: -0.377778, e: 0.6, f: 0.5, p: 0.5 }
+      ],
+      bbox: { x: -2.5, y: -1.5, w: 4, h: 3.5 },
+      hues: [200, 30]
+    },
+    // Maple Leaf (approximate IFS)
+    maple: {
+      transforms: [
+        { a: 0.14, b: 0.01, c: 0.00, d: 0.51, e: -0.08, f: -1.00, p: 0.10 },
+        { a: 0.43, b: 0.52, c: -0.46, d: 0.35, e: 0.00, f: -0.35, p: 0.18 },
+        { a: 0.45, b: -0.49, c: 0.47, d: 0.47, e: 0.00, f: -0.35, p: 0.18 },
+        { a: 0.49, b: 0.00, c: 0.00, d: 0.51, e: 0.00, f: 0.70, p: 0.24 },
+        { a: 0.30, b: 0.00, c: 0.00, d: 0.32, e: 0.00, f: 0.30, p: 0.30 }
+      ],
+      bbox: { x: -0.8, y: -1.3, w: 1.6, h: 2.3 },
+      hues: [20, 30, 350, 15, 5]
+    },
+    // Fractal Tree IFS
+    tree: {
+      transforms: [
+        { a: 0.05, b: 0.00, c: 0.00, d: 0.50, e: 0.00, f: 0.00, p: 0.10 },
+        { a: 0.05, b: -0.06, c: 0.00, d: -0.50, e: 0.00, f: 0.60, p: 0.10 },
+        { a: 0.46, b: -0.15, c: 0.39, d: 0.38, e: 0.00, f: 0.60, p: 0.23 },
+        { a: 0.47, b: -0.15, c: 0.17, d: 0.42, e: 0.00, f: 1.00, p: 0.23 },
+        { a: 0.43, b: 0.28, c: 0.25, d: 0.45, e: 0.00, f: 1.00, p: 0.24 }
+      ],
+      bbox: { x: -0.5, y: 0, w: 1, h: 1.6 },
+      hues: [30, 30, 100, 120, 80]
+    },
+    // Spiral
+    spiral: {
+      transforms: [
+        { a: 0.787, b: -0.421, c: 0.421, d: 0.787, e: 0.0, f: 0.0, p: 0.5 },
+        { a: -0.121, b: 0.257, c: -0.257, d: -0.121, e: 0.0, f: 0.0, p: 0.5 }
+      ],
+      bbox: { x: -0.5, y: -0.5, w: 1, h: 1 },
+      hues: [280, 200]
+    },
+    // Coral-like branching
+    coral: {
+      transforms: [
+        { a: 0.30, b: 0.00, c: 0.00, d: 0.30, e: 0.0, f: 0.0, p: 0.15 },
+        { a: 0.30, b: 0.30, c: -0.30, d: 0.30, e: 0.3, f: 0.0, p: 0.30 },
+        { a: 0.30, b: -0.30, c: 0.30, d: 0.30, e: 0.3, f: 0.0, p: 0.30 },
+        { a: 0.30, b: 0.00, c: 0.00, d: 0.30, e: 0.0, f: 0.3, p: 0.25 }
+      ],
+      bbox: { x: -0.6, y: 0, w: 1.2, h: 1.2 },
+      hues: [10, 0, 340, 30]
+    }
+  };
+
+  // --- Apply a preset ---
+  function ifsApplyPreset(name) {
+    var p = ifsPresets[name];
+    if (!p) return;
+    ifsCurrentPreset = name;
+    ifsTransforms = p.transforms;
+    ifsHues = p.hues;
+    ifsReset();
+  }
+
+  // --- Map IFS coordinate to canvas pixel ---
+  var ifsBbox = { x: 0, y: 0, w: 1, h: 1 };
+  function ifsUpdateBbox() {
+    var p = ifsPresets[ifsCurrentPreset];
+    if (!p) return;
+    var bb = p.bbox;
+    // Apply user scale
+    var sw = bb.w * ifsScale;
+    var sh = bb.h * ifsScale;
+    var sx = bb.x - (sw - bb.w) / 2;
+    var sy = bb.y - (sh - bb.h) / 2;
+    // Fit into canvas with padding
+    var pad = 30;
+    var availW = ifsW - 2 * pad;
+    var availH = ifsH - 2 * pad;
+    var scaleX = availW / sw;
+    var scaleY = availH / sh;
+    var s = Math.min(scaleX, scaleY);
+    // Center
+    var offsetX = (ifsW - sw * s) / 2 - sx * s;
+    var offsetY = ifsH - pad - sy * s; // flip Y, anchor bottom
+    ifsBbox = { sx: s, ox: offsetX, oy: offsetY };
+  }
+
+  function ifsMapX(x, y) {
+    return x * ifsBbox.sx + ifsBbox.ox;
+  }
+  function ifsMapY(x, y) {
+    return -y * ifsBbox.sx + ifsBbox.oy; // flip Y for screen coords
+  }
+
+  // --- Clear canvas ---
+  function ifsClear() {
+    ifsCtx.fillStyle = '#0a0a0b';
+    ifsCtx.fillRect(0, 0, ifsW, ifsH);
+  }
+
+  // --- Reset ---
+  function ifsReset() {
+    ifsClear();
+    ifsX = 0;
+    ifsY = 0;
+    ifsCount = 0;
+    ifsUpdateBbox();
+    document.getElementById('ifs-count-stat').textContent = '0';
+  }
+
+  // --- Pick a random transform (weighted) ---
+  function ifsPickTransform() {
+    var r = Math.random();
+    var cum = 0;
+    for (var i = 0; i < ifsTransforms.length; i++) {
+      cum += ifsTransforms[i].p;
+      if (r <= cum) return i;
+    }
+    return ifsTransforms.length - 1;
+  }
+
+  // --- Step: plot N points ---
+  function ifsStep() {
+    // Optional fade
+    if (ifsFade > 0) {
+      ifsCtx.fillStyle = 'rgba(10, 10, 11, ' + (ifsFade / 100) + ')';
+      ifsCtx.fillRect(0, 0, ifsW, ifsH);
+    }
+
+    var cosR = 1, sinR = 0;
+    if (ifsRotation !== 0) {
+      var rad = ifsRotation * Math.PI / 180;
+      cosR = Math.cos(rad);
+      sinR = Math.sin(rad);
+    }
+
+    for (var i = 0; i < ifsSpeed; i++) {
+      var ti = ifsPickTransform();
+      var t = ifsTransforms[ti];
+
+      // Apply affine transform
+      var nx = t.a * ifsX + t.b * ifsY + t.e;
+      var ny = t.c * ifsX + t.d * ifsY + t.f;
+      ifsX = nx;
+      ifsY = ny;
+
+      // Apply user rotation (around attractor center)
+      if (ifsRotation !== 0) {
+        var rx = cosR * ifsX - sinR * ifsY;
+        var ry = sinR * ifsX + cosR * ifsY;
+        ifsX = rx;
+        ifsY = ry;
+      }
+
+      // Map to canvas
+      var px = ifsMapX(ifsX, ifsY);
+      var py = ifsMapY(ifsX, ifsY);
+
+      // Color
+      var hue;
+      if (ifsColorMode === 'transform') {
+        hue = ifsHues[ti] !== undefined ? ifsHues[ti] : 0;
+        hue = (hue + ifsHueOffset) % 360;
+      } else if (ifsColorMode === 'position') {
+        hue = (ifsHueOffset + (px / ifsW) * 360) % 360;
+      } else {
+        hue = ifsHueOffset;
+      }
+
+      // Plot
+      ifsCtx.fillStyle = 'hsla(' + hue + ', 75%, 60%, ' + ifsOpacity + ')';
+      if (ifsPSize <= 1) {
+        ifsCtx.fillRect(px - 0.5, py - 0.5, Math.max(1, ifsPSize), Math.max(1, ifsPSize));
+      } else {
+        ifsCtx.beginPath();
+        ifsCtx.arc(px, py, ifsPSize / 2, 0, Math.PI * 2);
+        ifsCtx.fill();
+      }
+      ifsCount++;
+    }
+
+    document.getElementById('ifs-count-stat').textContent = ifsCount.toLocaleString();
+  }
+
+  // --- Randomize ---
+  function ifsRandomize() {
+    // Pick a random preset
+    var keys = Object.keys(ifsPresets);
+    var name = keys[Math.floor(Math.random() * keys.length)];
+    ifsHueOffset = Math.floor(Math.random() * 360);
+    ifsRotation = Math.floor((Math.random() - 0.5) * 90);
+    ifsScale = 0.8 + Math.random() * 0.4;
+    ifsColorMode = ['transform', 'position', 'single'][Math.floor(Math.random() * 3)];
+
+    // Update UI
+    document.getElementById('slider-ifs-hue').value = ifsHueOffset;
+    document.getElementById('ifs-hue-val').textContent = ifsHueOffset;
+    document.getElementById('slider-ifs-rot').value = ifsRotation;
+    document.getElementById('ifs-rot-val').textContent = ifsRotation;
+    document.getElementById('slider-ifs-scale').value = ifsScale.toFixed(2);
+    document.getElementById('ifs-scale-val').textContent = ifsScale.toFixed(2);
+    document.getElementById('ifs-colormode').value = ifsColorMode;
+
+    // Update preset button active state
+    document.querySelectorAll('#ifs-presets .preset-btn').forEach(function(btn) {
+      btn.classList.toggle('active', btn.dataset.preset === name);
+    });
+
+    ifsApplyPreset(name);
+  }
+
+  // --- Controls ---
+  var ifsPauseBtn = document.getElementById('ifs-pause');
+  ifsPauseBtn.addEventListener('click', function() {
+    expPaused[19] = !expPaused[19];
+    ifsPauseBtn.textContent = expPaused[19] ? 'Resume' : 'Pause';
+  });
+  document.getElementById('ifs-reset').addEventListener('click', function() {
+    ifsReset();
+  });
+  document.getElementById('ifs-randomize').addEventListener('click', function() {
+    ifsRandomize();
+  });
+  document.getElementById('ifs-clear').addEventListener('click', function() {
+    ifsClear();
+    ifsCount = 0;
+    document.getElementById('ifs-count-stat').textContent = '0';
+  });
+  document.getElementById('ifs-save').addEventListener('click', function() {
+    var link = document.createElement('a');
+    link.download = 'ifs-fractal.png';
+    link.href = ifsCanvas.toDataURL();
+    link.click();
+  });
+
+  // Preset buttons
+  document.querySelectorAll('#ifs-presets .preset-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#ifs-presets .preset-btn').forEach(function(b) {
+        b.classList.remove('active');
+      });
+      btn.classList.add('active');
+      ifsApplyPreset(btn.dataset.preset);
+    });
+  });
+
+  // Sliders
+  document.getElementById('slider-ifs-speed').addEventListener('input', function(e) {
+    ifsSpeed = parseInt(e.target.value);
+    document.getElementById('ifs-speed-val').textContent = ifsSpeed;
+  });
+  document.getElementById('slider-ifs-psize').addEventListener('input', function(e) {
+    ifsPSize = parseFloat(e.target.value);
+    document.getElementById('ifs-psize-val').textContent = ifsPSize.toFixed(1);
+  });
+  document.getElementById('slider-ifs-opacity').addEventListener('input', function(e) {
+    ifsOpacity = parseFloat(e.target.value);
+    document.getElementById('ifs-opacity-val').textContent = ifsOpacity.toFixed(2);
+  });
+  document.getElementById('slider-ifs-hue').addEventListener('input', function(e) {
+    ifsHueOffset = parseInt(e.target.value);
+    document.getElementById('ifs-hue-val').textContent = ifsHueOffset;
+  });
+  document.getElementById('slider-ifs-rot').addEventListener('change', function(e) {
+    ifsRotation = parseInt(e.target.value);
+    document.getElementById('ifs-rot-val').textContent = ifsRotation;
+    ifsReset();
+  });
+  document.getElementById('slider-ifs-scale').addEventListener('change', function(e) {
+    ifsScale = parseFloat(e.target.value);
+    document.getElementById('ifs-scale-val').textContent = ifsScale.toFixed(2);
+    ifsReset();
+  });
+  document.getElementById('ifs-colormode').addEventListener('change', function(e) {
+    ifsColorMode = e.target.value;
+  });
+  document.getElementById('slider-ifs-fade').addEventListener('input', function(e) {
+    ifsFade = parseFloat(e.target.value);
+    document.getElementById('ifs-fade-val').textContent = ifsFade + '%';
+  });
+
+  // Initialize
+  ifsApplyPreset('fern');
+
+
+  // ============================================================
   //  Main animation loop — runs all experiments, only updates
   //  the visible one for performance.
   // ============================================================
@@ -9148,6 +9601,8 @@
     } else if (activeExp === 18) {
       if (!fsPaused) fsStep();
       fsRender();
+    } else if (activeExp === 19 && !expPaused[19]) {
+      ifsStep();
     }
     // Experiment 11 is event-driven (not in the RAF loop, terrain renders on demand)
 
@@ -9175,6 +9630,7 @@
       else if (activeExp === 16) document.getElementById('fps17').textContent = fps;
       else if (activeExp === 17) document.getElementById('fps18').textContent = fps;
       else if (activeExp === 18) document.getElementById('fps19').textContent = fps;
+      else if (activeExp === 19) document.getElementById('fps20').textContent = fps;
       frameCount = 0;
       lastFpsTime = now;
     }
