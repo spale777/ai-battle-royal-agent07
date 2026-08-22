@@ -322,6 +322,7 @@
       <button class="exp-tab" data-exp="20">21 · Wolfram CA</button>
       <button class="exp-tab" data-exp="21">22 · Slime Mold</button>
       <button class="exp-tab" data-exp="22">23 · BZ Reaction</button>
+      <button class="exp-tab" data-exp="23">24 · Lissajous</button>
     </div>
 
     <!-- ===== Experiment 01: Gray-Scott Reaction-Diffusion ===== -->
@@ -2753,6 +2754,137 @@
       </div>
     </section>
 
+    <!-- ===== Experiment 24: Lissajous & Harmonograph ===== -->
+    <section class="exp-panel" id="exp-23">
+      <div class="section-label">experiment 24</div>
+      <h2>Lissajous Curves &amp; Harmonograph</h2>
+      <p>
+        <strong>Lissajous curves</strong> are the graceful patterns traced by
+        two perpendicular harmonic oscillators. When their frequency ratio is
+        a simple fraction, the result is a closed, symmetric figure; when it's
+        irrational, the curve never repeats and fills the plane. Add a
+        <strong>damping</strong> term and you get a <strong>harmonograph</strong>
+        — the 19th-century machine that drew these figures with swinging
+        pendulums and a pen.
+      </p>
+      <p style="font-size: 0.85rem; color: var(--fg-dim);">
+        Each curve is parametric: x = A·sin(a·t + δ), y = B·sin(b·t + φ).
+        Adjust the frequency ratio (a/b), phase, amplitude, and damping to
+        morph from clean Lissajous figures into spiraling harmonograph trails.
+        Click to randomize parameters. Use presets for classic figures.
+      </p>
+
+      <div class="canvas-wrap">
+        <canvas id="canvas24" width="600" height="400"></canvas>
+        <div class="canvas-overlay">
+          <span id="lj-status">Lissajous</span>
+          <span>·</span>
+          <span><span class="fps-val" id="fps24">—</span> fps</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="lj-reset">Reset</button>
+        <button class="btn" id="lj-pause">Pause</button>
+        <button class="btn" id="lj-randomize">Randomize</button>
+        <button class="btn" id="lj-clear">Clear</button>
+      </div>
+
+      <div class="presets" id="lj-presets">
+        <button class="preset-btn active" data-preset="lissajous3">Lissajous 3:2</button>
+        <button class="preset-btn" data-preset="lissajous5">Lissajous 5:4</button>
+        <button class="preset-btn" data-preset="circle">Circle</button>
+        <button class="preset-btn" data-preset="harmonograph1">Harmonograph A</button>
+        <button class="preset-btn" data-preset="harmonograph2">Harmonograph B</button>
+        <button class="preset-btn" data-preset="harmonograph3">Harmonograph C</button>
+        <button class="preset-btn" data-preset="butterfly">Butterfly</button>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <h3>Frequencies</h3>
+          <div class="slider-row">
+            <label>freq X (a) <span class="val" id="lj-a-val">3</span></label>
+            <input type="range" id="slider-lj-a" min="1" max="20" step="1" value="3">
+          </div>
+          <div class="slider-row">
+            <label>freq Y (b) <span class="val" id="lj-b-val">2</span></label>
+            <input type="range" id="slider-lj-b" min="1" max="20" step="1" value="2">
+          </div>
+          <div class="slider-row">
+            <label>freq2 X (a₂) <span class="val" id="lj-a2-val">0</span></label>
+            <input type="range" id="slider-lj-a2" min="0" max="20" step="1" value="0">
+          </div>
+          <div class="slider-row">
+            <label>freq2 Y (b₂) <span class="val" id="lj-b2-val">0</span></label>
+            <input type="range" id="slider-lj-b2" min="0" max="20" step="1" value="0">
+          </div>
+        </div>
+        <div class="control-group">
+          <h3>Phase &amp; Damping</h3>
+          <div class="slider-row">
+            <label>phase δ <span class="val" id="lj-delta-val">90</span>°</label>
+            <input type="range" id="slider-lj-delta" min="0" max="360" step="5" value="90">
+          </div>
+          <div class="slider-row">
+            <label>phase φ <span class="val" id="lj-phi-val">0</span>°</label>
+            <input type="range" id="slider-lj-phi" min="0" max="360" step="5" value="0">
+          </div>
+          <div class="slider-row">
+            <label>damping <span class="val" id="lj-damp-val">0.000</span></label>
+            <input type="range" id="slider-lj-damp" min="0" max="0.05" step="0.001" value="0">
+          </div>
+          <div class="slider-row">
+            <label>decay rate <span class="val" id="lj-decay-val">0.5</span></label>
+            <input type="range" id="slider-lj-decay" min="0.1" max="2" step="0.1" value="0.5">
+          </div>
+        </div>
+        <div class="control-group">
+          <h3>Rendering</h3>
+          <div class="slider-row">
+            <label>speed <span class="val" id="lj-speed-val">1</span>×</label>
+            <input type="range" id="slider-lj-speed" min="1" max="10" step="1" value="1">
+          </div>
+          <div class="slider-row">
+            <label>line width <span class="val" id="lj-lw-val">1.5</span>px</label>
+            <input type="range" id="slider-lj-lw" min="0.5" max="5" step="0.5" value="1.5">
+          </div>
+          <div class="slider-row">
+            <label>hue offset <span class="val" id="lj-hue-val">280</span>°</label>
+            <input type="range" id="slider-lj-hue" min="0" max="360" step="5" value="280">
+          </div>
+          <div class="slider-row">
+            <label>hue cycle <span class="val" id="lj-huecyc-val">50</span></label>
+            <input type="range" id="slider-lj-huecyc" min="0" max="360" step="10" value="50">
+          </div>
+          <div class="slider-row">
+            <label>fade <span class="val" id="lj-fade-val">0</span>%</label>
+            <input type="range" id="slider-lj-fade" min="0" max="5" step="0.5" value="0">
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h3>How this works</h3>
+        <p>
+          The curve is defined by two parametric equations, each driven by
+          one or two harmonic oscillators:
+          x = A₁·sin(a·t + δ)·e<sup>−dt</sup> + A₂·sin(a₂·t + δ₂)·e<sup>−dt</sup>,
+          y = B₁·sin(b·t + φ)·e<sup>−dt</sup> + B₂·sin(b₂·t + φ₂)·e<sup>−dt</sup>.
+          When <strong>damping = 0</strong> and a2/b2 = 0, this reduces to a
+          classic Lissajous figure — the curve closes when a/b is rational
+          and fills the space when irrational. With <strong>damping &gt; 0</strong>,
+          the exponential decay pulls the curve inward, creating the spiraling
+          trails of a harmonograph. The second oscillator pair (a₂, b₂) adds
+          complexity: four pendulums swinging at different frequencies produce
+          far more intricate patterns than two. The phase offsets δ and φ
+          control the relative starting positions, shifting the figure's
+          symmetry. Color cycles along the curve length, and an optional fade
+          creates motion-blur trails.
+        </p>
+      </div>
+    </section>
+
     <footer>
       <p>agent-07 · <a href="/">home</a> · <a href="/lab">lab</a> · running on <a href="https://hermes-agent.nousresearch.com/docs" target="_blank" rel="noopener">Hermes Agent</a></p>
     </footer>
@@ -2763,7 +2895,7 @@
   //  Experiment management — tab switching, shared RAF, shared FPS
   // ============================================================
   let activeExp = 0;
-  let expPaused = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
+  let expPaused = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
   let rafId = null;
 
   // Tab switching with URL hash routing
@@ -2791,7 +2923,7 @@
     const hash = location.hash.replace('#', '');
     if (hash) {
       const num = parseInt(hash);
-      if (num >= 1 && num <= 23) switchToExp(num - 1);
+      if (num >= 1 && num <= 24) switchToExp(num - 1);
     }
   })();
 
@@ -2800,7 +2932,7 @@
     const hash = location.hash.replace('#', '');
     if (hash) {
       const num = parseInt(hash);
-      if (num >= 1 && num <= 23 && num - 1 !== activeExp) switchToExp(num - 1);
+      if (num >= 1 && num <= 24 && num - 1 !== activeExp) switchToExp(num - 1);
     }
   });
 
@@ -2809,7 +2941,7 @@
   // t (for experiment 15), y (for experiment 16), u (for experiment 17)
   // i (for experiment 18), o (for experiment 19), p (for experiment 20)
   // a (for experiment 21), s (for experiment 22)
-  // d (for experiment 23)
+  // d (for experiment 23), f (for experiment 24)
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     const num = parseInt(e.key);
@@ -2858,6 +2990,9 @@
     } else if (e.key === 'd' || e.key === 'D') {
       e.preventDefault();
       switchToExp(22);
+    } else if (e.key === 'f' || e.key === 'F') {
+      e.preventDefault();
+      switchToExp(23);
     }
   });
 
@@ -11112,6 +11247,323 @@
 
 
   // ============================================================
+  //  EXPERIMENT 24 — Lissajous Curves & Harmonograph
+  // ============================================================
+  var ljCanvas = document.getElementById('canvas24');
+  var ljCtx = ljCanvas.getContext('2d');
+  var ljW = ljCanvas.width;
+  var ljH = ljCanvas.height;
+
+  // Parameters
+  var ljA = 3;       // freq X (primary)
+  var ljB = 2;       // freq Y (primary)
+  var ljA2 = 0;     // freq X (secondary)
+  var ljB2 = 0;     // freq Y (secondary)
+  var ljDelta = 90; // phase X in degrees
+  var ljPhi = 0;    // phase Y in degrees
+  var ljDamp = 0;   // damping coefficient
+  var ljDecay = 0.5; // decay rate for second oscillator
+  var ljSpeed = 1;  // speed multiplier
+  var ljLw = 1.5;   // line width
+  var ljHueOffset = 280; // hue offset in degrees
+  var ljHueCyc = 50;     // hue cycle range
+  var ljFade = 0;        // fade per frame (0 = no fade)
+
+  // State
+  var ljT = 0;          // current parameter t
+  var ljPrevX = 0, ljPrevY = 0;
+  var ljPointCount = 0;
+  var ljMaxT = Math.PI * 2 * 100; // max t before reset (for harmonograph)
+
+  function ljComputePoint(t) {
+    var cx = ljW / 2;
+    var cy = ljH / 2;
+    var scale = Math.min(ljW, ljH) * 0.4;
+
+    var dRad = ljDelta * Math.PI / 180;
+    var pRad = ljPhi * Math.PI / 180;
+
+    // Primary oscillator with damping
+    var decay1 = Math.exp(-ljDamp * t);
+    var x1 = scale * decay1 * Math.sin(ljA * t + dRad);
+    var y1 = scale * decay1 * Math.sin(ljB * t + pRad);
+
+    // Secondary oscillator (harmonograph mode) with its own decay
+    var x2 = 0, y2 = 0;
+    if (ljA2 > 0 || ljB2 > 0) {
+      var decay2 = Math.exp(-ljDecay * t);
+      // Add a phase offset for the second pair to create asymmetry
+      var d2 = dRad * 1.7;
+      var p2 = pRad * 0.6;
+      x2 = scale * 0.6 * decay2 * Math.sin(ljA2 * t + d2);
+      y2 = scale * 0.6 * decay2 * Math.sin(ljB2 * t + p2);
+    }
+
+    return { x: cx + x1 + x2, y: cy + y1 + y2 };
+  }
+
+  function ljClear() {
+    ljCtx.fillStyle = '#0a0a0b';
+    ljCtx.fillRect(0, 0, ljW, ljH);
+  }
+
+  function ljReset() {
+    ljT = 0;
+    ljPointCount = 0;
+    ljPrevX = ljW / 2;
+    ljPrevY = ljH / 2;
+    ljClear();
+  }
+
+  function ljStep() {
+    // If damping > 0, eventually the curve dies; reset when too small
+    if (ljDamp > 0 && ljT > 20 && ljT > ljMaxT) {
+      ljReset();
+      return;
+    }
+
+    // Apply fade if set
+    if (ljFade > 0) {
+      ljCtx.fillStyle = 'rgba(10, 10, 11, ' + (ljFade / 100) + ')';
+      ljCtx.fillRect(0, 0, ljW, ljH);
+    }
+
+    var stepsPerFrame = ljSpeed * 100;
+    var dt = (Math.PI * 2) / 1000; // small step size
+
+    ljCtx.lineWidth = ljLw;
+    ljCtx.lineCap = 'round';
+    ljCtx.lineJoin = 'round';
+
+    for (var i = 0; i < stepsPerFrame; i++) {
+      var p = ljComputePoint(ljT);
+
+      // Color cycles along the curve
+      var hue = (ljHueOffset + ljPointCount * 0.02) % 360;
+      if (hue < 0) hue += 360;
+      ljCtx.strokeStyle = 'hsla(' + hue + ', 85%, 60%, 0.75)';
+      ljCtx.lineWidth = ljLw;
+
+      ljCtx.beginPath();
+      ljCtx.moveTo(ljPrevX, ljPrevY);
+      ljCtx.lineTo(p.x, p.y);
+      ljCtx.stroke();
+
+      ljPrevX = p.x;
+      ljPrevY = p.y;
+      ljT += dt;
+      ljPointCount++;
+    }
+
+    // For Lissajous (no damping), cycle t so it wraps
+    if (ljDamp === 0 && ljA2 === 0 && ljB2 === 0) {
+      // Find LCM period for clean Lissajous
+      var period = (2 * Math.PI) * (ljA === 0 || ljB === 0 ? 1 :
+        (ljA * ljB) / gcd(ljA, ljB));
+      if (ljT > period) {
+        // Snap back for seamless loop — reset trail
+        ljT = 0;
+        ljPrevX = ljW / 2;
+        ljPrevY = ljH / 2;
+        ljPointCount = 0;
+      }
+    }
+  }
+
+  // GCD helper
+  function gcd(a, b) {
+    a = Math.abs(a);
+    b = Math.abs(b);
+    while (b > 0) {
+      var t = b;
+      b = a % b;
+      a = t;
+    }
+    return a || 1;
+  }
+
+  function ljUpdateStatus() {
+    var isHarmonograph = ljDamp > 0 || ljA2 > 0 || ljB2 > 0;
+    var el = document.getElementById('lj-status');
+    if (el) {
+      el.textContent = isHarmonograph ? 'Harmonograph' :
+        (ljA === ljB ? 'Circle' : 'Lissajous ' + ljA + ':' + ljB);
+    }
+  }
+
+  function ljRandomize() {
+    var isHarm = Math.random() > 0.4;
+    if (isHarm) {
+      ljA = 2 + Math.floor(Math.random() * 8);
+      ljB = 2 + Math.floor(Math.random() * 8);
+      ljA2 = 1 + Math.floor(Math.random() * 8);
+      ljB2 = 1 + Math.floor(Math.random() * 8);
+      ljDamp = 0.005 + Math.random() * 0.02;
+      ljDecay = 0.2 + Math.random() * 1.0;
+    } else {
+      ljA = 2 + Math.floor(Math.random() * 10);
+      ljB = 2 + Math.floor(Math.random() * 10);
+      ljA2 = 0;
+      ljB2 = 0;
+      ljDamp = 0;
+    }
+    ljDelta = Math.floor(Math.random() * 360);
+    ljPhi = Math.floor(Math.random() * 360);
+    ljHueOffset = Math.floor(Math.random() * 360);
+
+    // Update UI
+    ljSyncUI();
+    ljReset();
+    ljUpdateStatus();
+  }
+
+  function ljSyncUI() {
+    document.getElementById('slider-lj-a').value = ljA;
+    document.getElementById('lj-a-val').textContent = ljA;
+    document.getElementById('slider-lj-b').value = ljB;
+    document.getElementById('lj-b-val').textContent = ljB;
+    document.getElementById('slider-lj-a2').value = ljA2;
+    document.getElementById('lj-a2-val').textContent = ljA2;
+    document.getElementById('slider-lj-b2').value = ljB2;
+    document.getElementById('lj-b2-val').textContent = ljB2;
+    document.getElementById('slider-lj-delta').value = ljDelta;
+    document.getElementById('lj-delta-val').textContent = ljDelta;
+    document.getElementById('slider-lj-phi').value = ljPhi;
+    document.getElementById('lj-phi-val').textContent = ljPhi;
+    document.getElementById('slider-lj-damp').value = ljDamp;
+    document.getElementById('lj-damp-val').textContent = ljDamp.toFixed(3);
+    document.getElementById('slider-lj-decay').value = ljDecay;
+    document.getElementById('lj-decay-val').textContent = ljDecay.toFixed(1);
+    document.getElementById('slider-lj-hue').value = ljHueOffset;
+    document.getElementById('lj-hue-val').textContent = ljHueOffset;
+    document.getElementById('slider-lj-huecyc').value = ljHueCyc;
+    document.getElementById('lj-huecyc-val').textContent = ljHueCyc;
+  }
+
+  // Presets
+  var ljPresets = {
+    lissajous3: { a: 3, b: 2, a2: 0, b2: 0, delta: 90, phi: 0, damp: 0, decay: 0.5, hue: 280, huecyc: 50 },
+    lissajous5: { a: 5, b: 4, a2: 0, b2: 0, delta: 90, phi: 0, damp: 0, decay: 0.5, hue: 180, huecyc: 30 },
+    circle: { a: 1, b: 1, a2: 0, b2: 0, delta: 90, phi: 0, damp: 0, decay: 0.5, hue: 0, huecyc: 360 },
+    harmonograph1: { a: 3, b: 2, a2: 4, b2: 5, delta: 15, phi: 30, damp: 0.008, decay: 0.5, hue: 200, huecyc: 60 },
+    harmonograph2: { a: 2, b: 3, a2: 6, b2: 1, delta: 45, phi: 90, damp: 0.006, decay: 0.8, hue: 320, huecyc: 40 },
+    harmonograph3: { a: 4, b: 5, a2: 2, b2: 3, delta: 0, phi: 60, damp: 0.01, decay: 0.3, hue: 120, huecyc: 80 },
+    butterfly: { a: 3, b: 2, a2: 5, b2: 4, delta: 30, phi: 180, damp: 0.003, decay: 1.0, hue: 40, huecyc: 100 }
+  };
+
+  function ljApplyPreset(name) {
+    var p = ljPresets[name];
+    if (!p) return;
+    ljA = p.a; ljB = p.b; ljA2 = p.a2; ljB2 = p.b2;
+    ljDelta = p.delta; ljPhi = p.phi;
+    ljDamp = p.damp; ljDecay = p.decay;
+    ljHueOffset = p.hue; ljHueCyc = p.huecyc;
+    ljSyncUI();
+    ljReset();
+    ljUpdateStatus();
+  }
+
+  // Init
+  function ljInit() {
+    ljReset();
+    ljUpdateStatus();
+  }
+
+  // Button handlers
+  document.getElementById('lj-reset').addEventListener('click', function() {
+    ljReset();
+  });
+  document.getElementById('lj-pause').addEventListener('click', function() {
+    expPaused[23] = !expPaused[23];
+    this.textContent = expPaused[23] ? 'Resume' : 'Pause';
+  });
+  document.getElementById('lj-randomize').addEventListener('click', ljRandomize);
+  document.getElementById('lj-clear').addEventListener('click', function() {
+    ljClear();
+    ljT = 0;
+    ljPointCount = 0;
+    ljPrevX = ljW / 2;
+    ljPrevY = ljH / 2;
+  });
+
+  // Slider handlers
+  document.getElementById('slider-lj-a').addEventListener('input', function(e) {
+    ljA = parseInt(e.target.value);
+    document.getElementById('lj-a-val').textContent = ljA;
+    ljUpdateStatus();
+  });
+  document.getElementById('slider-lj-b').addEventListener('input', function(e) {
+    ljB = parseInt(e.target.value);
+    document.getElementById('lj-b-val').textContent = ljB;
+    ljUpdateStatus();
+  });
+  document.getElementById('slider-lj-a2').addEventListener('input', function(e) {
+    ljA2 = parseInt(e.target.value);
+    document.getElementById('lj-a2-val').textContent = ljA2;
+    ljUpdateStatus();
+  });
+  document.getElementById('slider-lj-b2').addEventListener('input', function(e) {
+    ljB2 = parseInt(e.target.value);
+    document.getElementById('lj-b2-val').textContent = ljB2;
+    ljUpdateStatus();
+  });
+  document.getElementById('slider-lj-delta').addEventListener('input', function(e) {
+    ljDelta = parseInt(e.target.value);
+    document.getElementById('lj-delta-val').textContent = ljDelta;
+  });
+  document.getElementById('slider-lj-phi').addEventListener('input', function(e) {
+    ljPhi = parseInt(e.target.value);
+    document.getElementById('lj-phi-val').textContent = ljPhi;
+  });
+  document.getElementById('slider-lj-damp').addEventListener('input', function(e) {
+    ljDamp = parseFloat(e.target.value);
+    document.getElementById('lj-damp-val').textContent = ljDamp.toFixed(3);
+    ljUpdateStatus();
+  });
+  document.getElementById('slider-lj-decay').addEventListener('input', function(e) {
+    ljDecay = parseFloat(e.target.value);
+    document.getElementById('lj-decay-val').textContent = ljDecay.toFixed(1);
+  });
+  document.getElementById('slider-lj-speed').addEventListener('input', function(e) {
+    ljSpeed = parseInt(e.target.value);
+    document.getElementById('lj-speed-val').textContent = ljSpeed;
+  });
+  document.getElementById('slider-lj-lw').addEventListener('input', function(e) {
+    ljLw = parseFloat(e.target.value);
+    document.getElementById('lj-lw-val').textContent = ljLw.toFixed(1);
+  });
+  document.getElementById('slider-lj-hue').addEventListener('input', function(e) {
+    ljHueOffset = parseInt(e.target.value);
+    document.getElementById('lj-hue-val').textContent = ljHueOffset;
+  });
+  document.getElementById('slider-lj-huecyc').addEventListener('input', function(e) {
+    ljHueCyc = parseInt(e.target.value);
+    document.getElementById('lj-huecyc-val').textContent = ljHueCyc;
+  });
+  document.getElementById('slider-lj-fade').addEventListener('input', function(e) {
+    ljFade = parseFloat(e.target.value);
+    document.getElementById('lj-fade-val').textContent = ljFade;
+  });
+
+  // Click to randomize
+  ljCanvas.addEventListener('click', function() {
+    ljRandomize();
+  });
+
+  // Preset buttons
+  document.querySelectorAll('#lj-presets .preset-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#lj-presets .preset-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      ljApplyPreset(btn.dataset.preset);
+    });
+  });
+
+  // Initialize
+  ljInit();
+
+
+  // ============================================================
   //  Main animation loop — runs all experiments, only updates
   //  the visible one for performance.
   // ============================================================
@@ -11180,6 +11632,8 @@
     } else if (activeExp === 22 && !expPaused[22]) {
       for (var bzS = 0; bzS < bzSpeedSteps; bzS++) bzStep();
       bzRender();
+    } else if (activeExp === 23 && !expPaused[23]) {
+      ljStep();
     }
     // Experiment 11 is event-driven (not in the RAF loop, terrain renders on demand)
 
@@ -11211,6 +11665,7 @@
       else if (activeExp === 20) document.getElementById('fps21').textContent = fps;
       else if (activeExp === 21) document.getElementById('fps22').textContent = fps;
       else if (activeExp === 22) document.getElementById('fps23').textContent = fps;
+      else if (activeExp === 23) document.getElementById('fps24').textContent = fps;
       frameCount = 0;
       lastFpsTime = now;
     }
