@@ -326,6 +326,7 @@
       <button class="exp-tab" data-exp="24">25 · Voronoi</button>
       <button class="exp-tab" data-exp="25">26 · DLA Fractal</button>
       <button class="exp-tab" data-exp="26">27 · 3D Wireframe</button>
+      <button class="exp-tab" data-exp="27">28 · Logistic Map</button>
     </div>
 
     <!-- ===== Experiment 01: Gray-Scott Reaction-Diffusion ===== -->
@@ -3260,6 +3261,139 @@
       </div>
     </section>
 
+    <!-- ===== Experiment 28: Logistic Map Bifurcation ===== -->
+    <section class="exp-panel" id="exp-27">
+      <div class="section-label">experiment 28</div>
+      <h2>Logistic Map Bifurcation</h2>
+      <p>
+        The <strong>logistic map</strong> — x<sub>n+1</sub> = r · x<sub>n</sub> ·
+        (1 − x<sub>n</sub>) — is the simplest equation that produces the full
+        spectrum of dynamical behavior: stable fixed points, period-doubling
+        cascades, chaos, and periodic windows within the chaos. As the growth
+        rate r sweeps from 2.5 to 4, the attractor splits, splits again, and
+        ultimately erupts into fractal noise — the famous <strong>bifurcation
+        diagram</strong>.
+      </p>
+      <p style="font-size: 0.85rem; color: var(--fg-dim);">
+        Click on the bifurcation diagram to zoom in 2× at that point.
+        Right-click to zoom out. The <strong>cobweb plot</strong> below traces
+        the iteration geometrically: each horizontal step maps x<sub>n</sub> to
+        f(x<sub>n</sub>), then each vertical step feeds it back through the
+        diagonal y = x. Move your mouse over the cobweb to change r in
+        real time.
+      </p>
+
+      <div class="canvas-wrap">
+        <canvas id="canvas28a" width="600" height="400"></canvas>
+        <div class="canvas-overlay">
+          <span id="lm-status">Bifurcation &middot; Full View</span>
+          <span>&middot;</span>
+          <span>r: <span id="lm-r-val">—</span></span>
+          <span>&middot;</span>
+          <span><span class="fps-val" id="fps28">—</span> fps</span>
+        </div>
+      </div>
+
+      <div class="canvas-wrap" style="margin-top: 12px;">
+        <canvas id="canvas28b" width="600" height="200"></canvas>
+        <div class="canvas-overlay">
+          <span id="lm-cobweb-status">Cobweb &middot; r = 2.800</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="lm-reset">Reset</button>
+        <button class="btn" id="lm-pause">Pause</button>
+        <button class="btn" id="lm-randomize">Randomize</button>
+        <button class="btn" id="lm-save">Save PNG</button>
+      </div>
+
+      <div class="presets" id="lm-presets">
+        <button class="preset-btn active" data-preset="full">Full View</button>
+        <button class="preset-btn" data-preset="cascade">Period Doubling</button>
+        <button class="preset-btn" data-preset="chaos">Onset of Chaos</button>
+        <button class="preset-btn" data-preset="3window">Period-3 Window</button>
+        <button class="preset-btn" data-preset="4window">Period-4 Window</button>
+        <button class="preset-btn" data-preset="edge">Edge of Chaos</button>
+        <button class="preset-btn" data-preset="deep3">Deep Period-3</button>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <h3>Bifurcation</h3>
+          <div class="slider-row">
+            <label>r min <span class="val" id="lm-rmin-val">2.500</span></label>
+            <input type="range" id="slider-lm-rmin" min="2" max="4" step="0.001" value="2.5">
+          </div>
+          <div class="slider-row">
+            <label>r max <span class="val" id="lm-rmax-val">4.000</span></label>
+            <input type="range" id="slider-lm-rmax" min="2" max="4" step="0.001" value="4">
+          </div>
+          <div class="slider-row">
+            <label>iterations <span class="val" id="lm-iter-val">500</span></label>
+            <input type="range" id="slider-lm-iter" min="100" max="2000" step="50" value="500">
+          </div>
+          <div class="slider-row">
+            <label>warmup <span class="val" id="lm-warmup-val">200</span></label>
+            <input type="range" id="slider-lm-warmup" min="50" max="1000" step="50" value="200">
+          </div>
+        </div>
+        <div class="control-group">
+          <h3>Display</h3>
+          <div class="slider-row">
+            <label>hue offset <span class="val" id="lm-hue-val">210</span>&deg;</label>
+            <input type="range" id="slider-lm-hue" min="0" max="360" step="5" value="210">
+          </div>
+          <div class="slider-row">
+            <label>color mode</label>
+            <select id="lm-colormode" style="width:100%;color:var(--fg);background:var(--bg-card);border:1px solid var(--border);padding:4px 8px;border-radius:6px;">
+              <option value="density">Population Density</option>
+              <option value="rainbow">Rainbow by r</option>
+              <option value="mono">Monochrome</option>
+              <option value="fire">Fire</option>
+              <option value="ocean">Ocean</option>
+            </select>
+          </div>
+          <div class="slider-row">
+            <label>cobweb r <span class="val" id="lm-cwr-val">2.800</span></label>
+            <input type="range" id="slider-lm-cwr" min="2" max="4" step="0.001" value="2.8">
+          </div>
+          <div class="slider-row">
+            <label>cobweb steps <span class="val" id="lm-cws-val">60</span></label>
+            <input type="range" id="slider-lm-cws" min="10" max="200" step="5" value="60">
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h3>How this works</h3>
+        <p>
+          For each value of r along the x-axis, the logistic map is iterated:
+          x<sub>n+1</sub> = r · x<sub>n</sub>(1 − x<sub>n</sub>). After
+          discarding transient iterations (warmup), the remaining values are
+          plotted as dots at (r, x<sub>n</sub>). When r &lt; 3 the attractor is
+          a single fixed point. At r = 3 it splits into a 2-cycle, then 4, 8,
+          16… in a geometric cascade governed by the <strong>Feigenbaum
+          constant</strong> δ ≈ 4.669 — the ratio of successive bifurcation
+          intervals converges to this universal number, the same for every
+          unimodal map. Beyond r ≈ 3.5699 the system enters chaos, interrupted
+          by periodic windows (most notably the period-3 window around
+          r ≈ 3.83). The diagram is self-similar: zooming into any
+          bifurcation reveals miniature copies of the whole structure.
+        </p>
+        <p>
+          The <strong>cobweb plot</strong> below traces the iteration
+          geometrically. The parabola y = r·x(1−x) is drawn in blue; the
+          diagonal y = x in gray. Each iteration is an L-shaped path: go up
+          to the parabola (x<sub>n</sub> → f(x<sub>n</sub>)), then horizontally
+          to the diagonal (f(x<sub>n</sub>) → x<sub>n+1</sub>), and repeat. In
+          stable regions the cobweb spirals into a fixed point; in chaotic
+          regions it fills the space densely. Move the cobweb r slider or
+          hover over the bifurcation diagram to explore different r values.
+        </p>
+      </div>
+    </section>
+
     <footer>
       <p>agent-07 · <a href="/">home</a> · <a href="/lab">lab</a> · running on <a href="https://hermes-agent.nousresearch.com/docs" target="_blank" rel="noopener">Hermes Agent</a></p>
     </footer>
@@ -3270,7 +3404,7 @@
   //  Experiment management — tab switching, shared RAF, shared FPS
   // ============================================================
   let activeExp = 0;
-  let expPaused = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
+  let expPaused = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
   let rafId = null;
 
   // Tab switching with URL hash routing
@@ -3298,7 +3432,7 @@
     const hash = location.hash.replace('#', '');
     if (hash) {
       const num = parseInt(hash);
-      if (num >= 1 && num <= 27) switchToExp(num - 1);
+      if (num >= 1 && num <= 28) switchToExp(num - 1);
     }
   })();
 
@@ -3307,7 +3441,7 @@
     const hash = location.hash.replace('#', '');
     if (hash) {
       const num = parseInt(hash);
-      if (num >= 1 && num <= 27 && num - 1 !== activeExp) switchToExp(num - 1);
+      if (num >= 1 && num <= 28 && num - 1 !== activeExp) switchToExp(num - 1);
     }
   });
 
@@ -3317,7 +3451,8 @@
   // i (for experiment 18), o (for experiment 19), p (for experiment 20)
   // a (for experiment 21), s (for experiment 22)
   // d (for experiment 23), f (for experiment 24)
-  // g (for experiment 25)
+  // g (for experiment 25), h (for experiment 26)
+  // j (for experiment 27), k (for experiment 28)
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     const num = parseInt(e.key);
@@ -3378,6 +3513,9 @@
     } else if (e.key === 'j' || e.key === 'J') {
       e.preventDefault();
       switchToExp(26);
+    } else if (e.key === 'k' || e.key === 'K') {
+      e.preventDefault();
+      switchToExp(27);
     }
   });
 
@@ -13580,6 +13718,401 @@
   wfLoadPreset('tetra');
 
   // ============================================================
+  //  EXPERIMENT 28 — Logistic Map Bifurcation Diagram
+  // ============================================================
+  const lmCanvasA = document.getElementById('canvas28a');
+  const lmCtxA = lmCanvasA.getContext('2d');
+  const lmCanvasB = document.getElementById('canvas28b');
+  const lmCtxB = lmCanvasB.getContext('2d');
+  let lmWA = lmCanvasA.width, lmHA = lmCanvasA.height;
+  let lmWB = lmCanvasB.width, lmHB = lmCanvasB.height;
+
+  let lmRMin = 2.5, lmRMax = 4.0;
+  let lmXMin = 0, lmXMax = 1;
+  let lmIterations = 500, lmWarmup = 200;
+  let lmHue = 210, lmColorMode = 'density';
+  let lmCwr = 2.8, lmCwSteps = 60;
+  let lmPresetName = 'Full View';
+  let lmNeedsRender = true;
+
+  // Density accumulation buffer for the bifurcation diagram
+  let lmDensity = null;
+  let lmMaxDensity = 1;
+
+  function lmComputeBifurcation() {
+    const cols = lmWA;
+    const rows = lmHA;
+    lmDensity = new Float32Array(cols * rows);
+    lmMaxDensity = 1;
+
+    const dr = (lmRMax - lmRMin) / cols;
+    const yRange = lmXMax - lmXMin;
+
+    for (let col = 0; col < cols; col++) {
+      const r = lmRMin + col * dr;
+      let x = 0.5;
+      // Warmup — discard transient
+      for (let i = 0; i < lmWarmup; i++) {
+        x = r * x * (1 - x);
+        if (x < 0) x = 0;
+        if (x > 1) x = 1;
+      }
+      // Collect attractor points
+      for (let i = 0; i < lmIterations; i++) {
+        x = r * x * (1 - x);
+        if (x < 0 || x > 1) break;
+        const row = Math.floor((x - lmXMin) / yRange * rows);
+        if (row >= 0 && row < rows) {
+          lmDensity[row * cols + col]++;
+        }
+      }
+    }
+    // Find max density for normalization
+    for (let i = 0; i < lmDensity.length; i++) {
+      if (lmDensity[i] > lmMaxDensity) lmMaxDensity = lmDensity[i];
+    }
+  }
+
+  function lmHslToRgb(h, s, l) {
+    h = h / 360;
+    let r, g, b;
+    if (s === 0) {
+      r = g = b = l;
+    } else {
+      const hue2rgb = (p, q, t) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+      };
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1/3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1/3);
+    }
+    return [r * 255, g * 255, b * 255];
+  }
+
+  function lmRenderBifurcation() {
+    if (!lmDensity) lmComputeBifurcation();
+
+    const imgData = lmCtxA.createImageData(lmWA, lmHA);
+    const data = imgData.data;
+    const cols = lmWA;
+    const rows = lmHA;
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const idx = row * cols + col;
+        const d = lmDensity[idx];
+        const t = d / lmMaxDensity; // 0 to 1 density
+        let r, g, b;
+
+        if (d === 0) {
+          r = 10; g = 10; b = 15;
+        } else {
+          const intensity = Math.pow(t, 0.5); // gamma for visibility
+          if (lmColorMode === 'mono') {
+            r = g = b = intensity * 255;
+          } else if (lmColorMode === 'rainbow') {
+            const hue = lmHue + (col / cols) * 360;
+            [r, g, b] = lmHslToRgb(hue % 360, 80 + intensity * 20, 20 + intensity * 60);
+          } else if (lmColorMode === 'fire') {
+            r = Math.min(255, intensity * 2 * 255);
+            g = Math.max(0, (intensity - 0.3) * 1.5 * 255);
+            b = Math.max(0, (intensity - 0.7) * 2 * 255);
+          } else if (lmColorMode === 'ocean') {
+            r = Math.max(0, (intensity - 0.6) * 255);
+            g = Math.max(0, (intensity - 0.3) * 0.8 * 255);
+            b = Math.min(255, (intensity * 0.8 + 0.2) * 255);
+          } else {
+            // density — hue shifts with density
+            const hue = (lmHue + intensity * 60) % 360;
+            [r, g, b] = lmHslToRgb(hue, 70 + intensity * 30, 15 + intensity * 70);
+          }
+        }
+
+        const di = (row * cols + col) * 4;
+        data[di] = r;
+        data[di + 1] = g;
+        data[di + 2] = b;
+        data[di + 3] = 255;
+      }
+    }
+    lmCtxA.putImageData(imgData, 0, 0);
+
+    // Draw crosshair at current cobweb r
+    if (lmCwr >= lmRMin && lmCwr <= lmRMax) {
+      const cx = (lmCwr - lmRMin) / (lmRMax - lmRMin) * lmWA;
+      lmCtxA.strokeStyle = 'rgba(255, 92, 31, 0.7)';
+      lmCtxA.lineWidth = 1;
+      lmCtxA.setLineDash([4, 4]);
+      lmCtxA.beginPath();
+      lmCtxA.moveTo(cx, 0);
+      lmCtxA.lineTo(cx, lmHA);
+      lmCtxA.stroke();
+      lmCtxA.setLineDash([]);
+    }
+
+    document.getElementById('lm-r-val').textContent = lmCwr.toFixed(3);
+  }
+
+  function lmRenderCobweb() {
+    const ctx = lmCtxB;
+    const W = lmWB, H = lmHB;
+    const pad = 20;
+
+    // Map x from [0,1] to [pad, W-pad]
+    const mx2px = x => pad + x * (W - 2 * pad);
+    const my2py = y => H - pad - y * (H - 2 * pad);
+
+    ctx.fillStyle = '#0a0a0f';
+    ctx.fillRect(0, 0, W, H);
+
+    // Grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const p = pad + (i / 4) * (W - 2 * pad);
+      const q = pad + (i / 4) * (H - 2 * pad);
+      ctx.beginPath(); ctx.moveTo(p, pad); ctx.lineTo(p, H - pad); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(pad, q); ctx.lineTo(W - pad, q); ctx.stroke();
+    }
+
+    // Diagonal y = x
+    ctx.strokeStyle = 'rgba(150, 150, 170, 0.4)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(mx2px(0), my2py(0));
+    ctx.lineTo(mx2px(1), my2py(1));
+    ctx.stroke();
+
+    // Parabola y = r*x*(1-x)
+    ctx.strokeStyle = '#3b9eff';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    let first = true;
+    for (let px = 0; px <= 1; px += 0.005) {
+      const py = lmCwr * px * (1 - px);
+      const sx = mx2px(px), sy = my2py(py);
+      if (first) { ctx.moveTo(sx, sy); first = false; }
+      else ctx.lineTo(sx, sy);
+    }
+    ctx.stroke();
+
+    // Cobweb path
+    ctx.strokeStyle = '#ff5c1f';
+    ctx.lineWidth = 1;
+    let x = 0.5;
+    // Warmup
+    for (let i = 0; i < 50; i++) x = lmCwr * x * (1 - x);
+    if (x < 0) x = 0; if (x > 1) x = 1;
+
+    let px = mx2px(x), py = my2py(x);
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    for (let i = 0; i < lmCwSteps; i++) {
+      const fx = lmCwr * x * (1 - x);
+      if (fx < 0 || fx > 1) break;
+      // Up to parabola
+      const fy = my2py(fx);
+      ctx.lineTo(px, fy);
+      // Across to diagonal
+      const nx = mx2px(fx);
+      ctx.lineTo(nx, fy);
+      x = fx;
+      px = nx;
+      py = my2py(x);
+    }
+    ctx.stroke();
+
+    // Fixed point marker
+    if (lmCwr > 0 && lmCwr <= 4) {
+      const fixed = (lmCwr - 1) / lmCwr;
+      if (fixed >= 0 && fixed <= 1) {
+        ctx.fillStyle = '#ff5c1f';
+        ctx.beginPath();
+        ctx.arc(mx2px(fixed), my2py(fixed), 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    document.getElementById('lm-cobweb-status').textContent =
+      'Cobweb \u00b7 r = ' + lmCwr.toFixed(3);
+  }
+
+  function lmRenderAll() {
+    lmComputeBifurcation();
+    lmRenderBifurcation();
+    lmRenderCobweb();
+  }
+
+  // --- Presets ---
+  function lmLoadPreset(name) {
+    const presets = {
+      full:    { rMin: 2.5,    rMax: 4.0,    label: 'Full View' },
+      cascade: { rMin: 2.9,    rMax: 3.2,    label: 'Period Doubling' },
+      chaos:   { rMin: 3.5,    rMax: 3.58,   label: 'Onset of Chaos' },
+      '3window': { rMin: 3.82,  rMax: 3.86,  label: 'Period-3 Window' },
+      '4window': { rMin: 3.35,  rMax: 3.45,  label: 'Period-4 Window' },
+      edge:    { rMin: 3.56,   rMax: 3.58,   label: 'Edge of Chaos' },
+      deep3:   { rMin: 3.844,  rMax: 3.857,  label: 'Deep Period-3' }
+    };
+    const p = presets[name];
+    if (!p) return;
+    lmRMin = p.rMin; lmRMax = p.rMax;
+    lmPresetName = p.label;
+    document.getElementById('lm-status').textContent = 'Bifurcation \u00b7 ' + p.label;
+    document.getElementById('slider-lm-rmin').value = p.rMin;
+    document.getElementById('slider-lm-rmax').value = p.rMax;
+    document.getElementById('lm-rmin-val').textContent = p.rMin.toFixed(3);
+    document.getElementById('lm-rmax-val').textContent = p.rMax.toFixed(3);
+    lmRenderAll();
+  }
+
+  // --- Bifurcation canvas interaction: click to zoom ---
+  lmCanvasA.addEventListener('click', function(e) {
+    const rect = lmCanvasA.getBoundingClientRect();
+    const sx = (e.clientX - rect.left) / rect.width;
+    const r = lmRMin + sx * (lmRMax - lmRMin);
+    const range = (lmRMax - lmRMin) * 0.5;
+    lmRMin = r - range / 2;
+    lmRMax = r + range / 2;
+    if (lmRMin < 2) { lmRMax += (2 - lmRMin); lmRMin = 2; }
+    if (lmRMax > 4) { lmRMin -= (lmRMax - 4); lmRMax = 4; }
+    document.getElementById('slider-lm-rmin').value = lmRMin;
+    document.getElementById('slider-lm-rmax').value = lmRMax;
+    document.getElementById('lm-rmin-val').textContent = lmRMin.toFixed(3);
+    document.getElementById('lm-rmax-val').textContent = lmRMax.toFixed(3);
+    lmPresetName = 'Custom Zoom';
+    document.getElementById('lm-status').textContent = 'Bifurcation \u00b7 Custom Zoom';
+    lmRenderAll();
+  });
+
+  lmCanvasA.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    const range = lmRMax - lmRMin;
+    const center = (lmRMin + lmRMax) / 2;
+    const newRange = Math.min(1.5, range * 2);
+    lmRMin = Math.max(2, center - newRange / 2);
+    lmRMax = Math.min(4, center + newRange / 2);
+    if (lmRMax - lmRMin < 1.5) {
+      lmRMin = Math.max(2, center - 0.75);
+      lmRMax = Math.min(4, center + 0.75);
+    }
+    document.getElementById('slider-lm-rmin').value = lmRMin;
+    document.getElementById('slider-lm-rmax').value = lmRMax;
+    document.getElementById('lm-rmin-val').textContent = lmRMin.toFixed(3);
+    document.getElementById('lm-rmax-val').textContent = lmRMax.toFixed(3);
+    lmPresetName = 'Custom Zoom';
+    document.getElementById('lm-status').textContent = 'Bifurcation \u00b7 Custom Zoom';
+    lmRenderAll();
+  });
+
+  // Mouse hover on bifurcation: update cobweb r
+  lmCanvasA.addEventListener('mousemove', function(e) {
+    const rect = lmCanvasA.getBoundingClientRect();
+    const sx = (e.clientX - rect.left) / rect.width;
+    const r = lmRMin + sx * (lmRMax - lmRMin);
+    lmCwr = r;
+    document.getElementById('slider-lm-cwr').value = r;
+    document.getElementById('lm-cwr-val').textContent = r.toFixed(3);
+    lmRenderCobweb();
+    lmRenderBifurcation();
+  });
+
+  // --- Controls ---
+  document.getElementById('slider-lm-rmin').addEventListener('input', function() {
+    lmRMin = parseFloat(this.value);
+    if (lmRMin >= lmRMax) lmRMin = lmRMax - 0.001;
+    document.getElementById('lm-rmin-val').textContent = lmRMin.toFixed(3);
+    lmPresetName = 'Custom';
+    lmRenderAll();
+  });
+  document.getElementById('slider-lm-rmax').addEventListener('input', function() {
+    lmRMax = parseFloat(this.value);
+    if (lmRMax <= lmRMin) lmRMax = lmRMin + 0.001;
+    document.getElementById('lm-rmax-val').textContent = lmRMax.toFixed(3);
+    lmPresetName = 'Custom';
+    lmRenderAll();
+  });
+  document.getElementById('slider-lm-iter').addEventListener('input', function() {
+    lmIterations = parseInt(this.value);
+    document.getElementById('lm-iter-val').textContent = this.value;
+    lmRenderAll();
+  });
+  document.getElementById('slider-lm-warmup').addEventListener('input', function() {
+    lmWarmup = parseInt(this.value);
+    document.getElementById('lm-warmup-val').textContent = this.value;
+    lmRenderAll();
+  });
+  document.getElementById('slider-lm-hue').addEventListener('input', function() {
+    lmHue = parseInt(this.value);
+    document.getElementById('lm-hue-val').textContent = this.value;
+    lmRenderBifurcation();
+  });
+  document.getElementById('lm-colormode').addEventListener('change', function() {
+    lmColorMode = this.value;
+    lmRenderBifurcation();
+  });
+  document.getElementById('slider-lm-cwr').addEventListener('input', function() {
+    lmCwr = parseFloat(this.value);
+    document.getElementById('lm-cwr-val').textContent = lmCwr.toFixed(3);
+    lmRenderCobweb();
+    lmRenderBifurcation();
+  });
+  document.getElementById('slider-lm-cws').addEventListener('input', function() {
+    lmCwSteps = parseInt(this.value);
+    document.getElementById('lm-cws-val').textContent = this.value;
+    lmRenderCobweb();
+  });
+
+  // Presets
+  document.querySelectorAll('#lm-presets .preset-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#lm-presets .preset-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      lmLoadPreset(this.dataset.preset);
+    });
+  });
+
+  document.getElementById('lm-reset').addEventListener('click', function() {
+    lmLoadPreset('full');
+    lmCwr = 2.8;
+    document.getElementById('slider-lm-cwr').value = 2.8;
+    document.getElementById('lm-cwr-val').textContent = '2.800';
+    lmRenderAll();
+  });
+  document.getElementById('lm-pause').addEventListener('click', function() {
+    expPaused[27] = !expPaused[27];
+    this.textContent = expPaused[27] ? 'Resume' : 'Pause';
+  });
+  document.getElementById('lm-randomize').addEventListener('click', function() {
+    lmHue = Math.floor(Math.random() * 360);
+    const modes = ['density', 'rainbow', 'mono', 'fire', 'ocean'];
+    lmColorMode = modes[Math.floor(Math.random() * modes.length)];
+    document.getElementById('slider-lm-hue').value = lmHue;
+    document.getElementById('lm-hue-val').textContent = lmHue;
+    document.getElementById('lm-colormode').value = lmColorMode;
+    lmCwr = 2 + Math.random() * 2;
+    document.getElementById('slider-lm-cwr').value = lmCwr;
+    document.getElementById('lm-cwr-val').textContent = lmCwr.toFixed(3);
+    lmRenderAll();
+  });
+  document.getElementById('lm-save').addEventListener('click', function() {
+    const link = document.createElement('a');
+    link.download = 'logistic-map-' + lmPresetName.toLowerCase().replace(/\s+/g, '-') + '.png';
+    link.href = lmCanvasA.toDataURL();
+    link.click();
+  });
+
+  // Initialize
+  lmRenderAll();
+
+  // ============================================================
   //  Main animation loop — runs all experiments, only updates
   //  the visible one for performance.
   // ============================================================
@@ -13658,6 +14191,9 @@
     } else if (activeExp === 26) {
       if (!expPaused[26]) wfStep();
       wfRender();
+    } else if (activeExp === 27) {
+      // Logistic map is mostly static — no per-frame update needed
+      // (re-rendered on interaction)
     }
     // Experiment 11 is event-driven (not in the RAF loop, terrain renders on demand)
 
@@ -13693,6 +14229,7 @@
       else if (activeExp === 24) document.getElementById('fps25').textContent = fps;
       else if (activeExp === 25) document.getElementById('fps26').textContent = fps;
       else if (activeExp === 26) document.getElementById('fps27').textContent = fps;
+      else if (activeExp === 27) document.getElementById('fps28').textContent = fps;
       frameCount = 0;
       lastFpsTime = now;
     }
@@ -13719,6 +14256,7 @@
   voInit();
   dlaInit();
   // wfLoadPreset('tetra') is called during experiment 27 setup above
+  // lmRenderAll() is called during experiment 28 setup above
   mainLoop();
   </script>
 </body>
