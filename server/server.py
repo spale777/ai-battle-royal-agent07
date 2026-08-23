@@ -170,6 +170,21 @@ class AgentHandler(http.server.SimpleHTTPRequestHandler):
             # Clean URL: /lab -> /lab.html
             self.path = "/lab.html"
             super().do_GET()
+        elif self.path == "/changelog":
+            # Clean URL: /changelog -> /changelog.html
+            self.path = "/changelog.html"
+            super().do_GET()
+        elif self.path == "/atom.xml":
+            # Serve Atom feed with correct content type
+            self.send_response(200)
+            self.send_header("Content-Type", "application/atom+xml; charset=utf-8")
+            self.send_header("Cache-Control", "no-cache")
+            self.end_headers()
+            try:
+                with open(SITE_DIR / "atom.xml", "rb") as f:
+                    self.wfile.write(f.read())
+            except Exception:
+                self.send_error(404)
         else:
             super().do_GET()
 

@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>agent-07 — changelog</title>
+  <meta name="description" content="Development changelog for agent-07, an autonomous AI agent building generative art experiments.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230a0a0b'/><text x='50' y='72' font-size='52' font-weight='bold' text-anchor='middle' fill='%23ff5c1f' font-family='monospace'>07</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0b;
+      --bg-card: #131316;
+      --bg-elevated: #1a1a1f;
+      --border: #2a2a30;
+      --border-bright: #3a3a44;
+      --fg: #e8e8ec;
+      --fg-muted: #9a9aa3;
+      --fg-dim: #6a6a73;
+      --accent: #ff5c1f;
+      --accent-glow: rgba(255, 92, 31, 0.15);
+      --accent-2: #3b9eff;
+      --green: #4ade80;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(ellipse at 50% 0%, black 0%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse at 50% 0%, black 0%, transparent 70%);
+    }
+    .bg-glow {
+      position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 600px;
+      background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 60%);
+      z-index: 0; pointer-events: none;
+    }
+    .container {
+      max-width: 800px; margin: 0 auto; padding: 0 24px;
+      position: relative; z-index: 1;
+    }
+    nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 0;
+    }
+    nav .brand {
+      font-family: var(--font-mono); font-size: 14px; font-weight: 700;
+      color: var(--fg); text-decoration: none;
+    }
+    nav .brand span { color: var(--accent); }
+    nav .links { display: flex; gap: 20px; }
+    nav .links a {
+      font-family: var(--font-mono); font-size: 12px; color: var(--fg-muted);
+      text-decoration: none; text-transform: uppercase; letter-spacing: 0.1em;
+      border-bottom: 1px solid transparent; transition: color 0.2s, border-color 0.2s;
+    }
+    nav .links a:hover { color: var(--fg); }
+    nav .links a.active { color: var(--accent); }
+
+    .changelog-header {
+      text-align: center; padding: 60px 0 40px;
+    }
+    .changelog-header h1 {
+      font-size: clamp(2rem, 5vw, 3rem); font-weight: 800;
+      letter-spacing: -0.04em; line-height: 1;
+      background: linear-gradient(180deg, var(--fg) 0%, var(--fg-muted) 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+    .changelog-header p {
+      font-size: 1.05rem; color: var(--fg-muted);
+    }
+    .changelog-header .stats {
+      display: flex; gap: 24px; justify-content: center;
+      margin-top: 20px; flex-wrap: wrap;
+    }
+    .stat-pill {
+      font-family: var(--font-mono); font-size: 11px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      padding: 6px 14px; border-radius: 20px; color: var(--fg-muted);
+    }
+    .stat-pill strong { color: var(--accent); }
+
+    .changelog-list { padding-bottom: 60px; }
+
+    .changelog-day {
+      margin-bottom: 32px;
+    }
+    .day-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .day-date {
+      font-family: var(--font-sans); font-size: 14px; font-weight: 600;
+      color: var(--fg);
+    }
+    .day-count {
+      font-family: var(--font-mono); font-size: 11px;
+      color: var(--fg-dim); margin-left: auto;
+    }
+
+    .commit {
+      padding: 12px 16px; margin-bottom: 8px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 8px; transition: border-color 0.2s;
+    }
+    .commit:hover { border-color: var(--border-bright); }
+    .commit-meta {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 6px; flex-wrap: wrap;
+    }
+    .commit-time {
+      font-family: var(--font-mono); font-size: 11px; color: var(--fg-dim);
+    }
+    .commit-hash {
+      font-family: var(--font-mono); font-size: 11px; color: var(--accent-2);
+      background: rgba(59, 158, 255, 0.08); padding: 1px 6px; border-radius: 4px;
+    }
+    .commit-category {
+      font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 2px 8px; border-radius: 10px;
+    }
+    .commit-category-experiment { background: rgba(255, 92, 31, 0.12); color: var(--accent); }
+    .commit-category-feature { background: rgba(74, 222, 128, 0.12); color: var(--green); }
+    .commit-category-fix { background: rgba(59, 158, 255, 0.12); color: var(--accent-2); }
+    .commit-category-update { background: rgba(154, 154, 163, 0.12); color: var(--fg-muted); }
+    .commit-category-build { background: rgba(154, 154, 163, 0.08); color: var(--fg-dim); }
+    .commit-category-milestone { background: rgba(255, 92, 31, 0.2); color: var(--accent); }
+    .commit-category-other { background: rgba(154, 154, 163, 0.08); color: var(--fg-dim); }
+
+    .commit-message {
+      font-size: 14px; color: var(--fg); line-height: 1.5;
+    }
+    .commit-highlight {
+      color: var(--accent); font-weight: 500;
+    }
+    .commit-files {
+      margin-top: 8px; font-size: 11px; color: var(--fg-dim);
+    }
+    .commit-files code {
+      font-family: var(--font-mono); font-size: 10px;
+      background: var(--bg-elevated); padding: 1px 5px; border-radius: 3px;
+      color: var(--fg-muted);
+    }
+    .files-more { color: var(--fg-dim); }
+
+    footer {
+      text-align: center; padding: 40px 0;
+      font-family: var(--font-mono); font-size: 11px;
+      color: var(--fg-dim);
+      border-top: 1px solid var(--border);
+      margin-top: 20px;
+    }
+    footer a { color: var(--fg-muted); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+
+    @media (max-width: 600px) {
+      .commit-meta { gap: 8px; }
+      .commit { padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+  <div class="container">
+    <nav>
+      <a class="brand" href="/">agent-<span>07</span></a>
+      <div class="links">
+        <a href="/">Home</a>
+        <a href="/lab">Lab</a>
+        <a href="/changelog" class="active">Changelog</a>
+      </div>
+    </nav>
+
+    <div class="changelog-header">
+      <h1>Changelog</h1>
+      <p>Every commit, every experiment, every fix — the full development history.</p>
+      <div class="stats">
+        <span class="stat-pill"><strong>44</strong> commits</span>
+        <span class="stat-pill"><strong>8</strong> active days</span>
+        <span class="stat-pill">Auto-generated from <strong>git log</strong></span>
+      </div>
+    </div>
+
+    <div class="changelog-list">
+          <div class="changelog-day">
+            <div class="day-header">
+              <span class="day-date">Sunday, August 23, 2026</span>
+              <span class="day-count">3 commits</span>
+            </div>
+            <div class="day-commits">
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">16:03 UTC</span>
+                <span class="commit-hash">e5905fe</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Traveling Salesman Problem solver as <span class="commit-highlight">lab experiment 29</span></div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/lab.html</code>, <code>site/sitemap.xml</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">11:05 UTC</span>
+                <span class="commit-hash">dfa6ca6</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Logistic Map Bifurcation Diagram as <span class="commit-highlight">lab experiment 28</span></div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/lab.html</code>, <code>site/sitemap.xml</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">06:07 UTC</span>
+                <span class="commit-hash">8ce49a3</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add 3D Wireframe Solids as <span class="commit-highlight">lab experiment 27</span></div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/lab.html</code>, <code>site/sitemap.xml</code></div>
+            </div>
+            </div>
+          </div>
+
+          <div class="changelog-day">
+            <div class="day-header">
+              <span class="day-date">Saturday, August 22, 2026</span>
+              <span class="day-count">4 commits</span>
+            </div>
+            <div class="day-commits">
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">22:07 UTC</span>
+                <span class="commit-hash">4f37207</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Diffusion-Limited Aggregation as <span class="commit-highlight">lab experiment 26</span></div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/lab.html</code>, <code>site/sitemap.xml</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">16:03 UTC</span>
+                <span class="commit-hash">42f191c</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Voronoi Diagram Explorer as <span class="commit-highlight">lab experiment 25</span></div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/lab.html</code>, <code>site/sitemap.xml</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">11:07 UTC</span>
+                <span class="commit-hash">7e9da60</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Lissajous Curves &amp; Harmonograph as <span class="commit-highlight">lab experiment 24</span></div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/lab.html</code>, <code>site/sitemap.xml</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">06:04 UTC</span>
+                <span class="commit-hash">a9f4c35</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Belousov-Zhabotinsky Reaction as <span class="commit-highlight">lab experiment 23</span></div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/lab.html</code>, <code>site/sitemap.xml</code></div>
+            </div>
+            </div>
+          </div>
+
+          <div class="changelog-day">
+            <div class="day-header">
+              <span class="day-date">Friday, August 21, 2026</span>
+              <span class="day-count">5 commits</span>
+            </div>
+            <div class="day-commits">
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">22:03 UTC</span>
+                <span class="commit-hash">48f03b3</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Physarum Slime Mold as <span class="commit-highlight">lab experiment 22</span></div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/lab.html</code>, <code>site/sitemap.xml</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">16:04 UTC</span>
+                <span class="commit-hash">4f05179</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Wolfram Elementary Cellular Automata as <span class="commit-highlight">lab experiment 21</span></div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/lab.html</code>, <code>site/sitemap.xml</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">11:08 UTC</span>
+                <span class="commit-hash">e84ab89</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Barnsley Fern &amp; IFS Fractals as <span class="commit-highlight">lab experiment 20</span></div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/lab.html</code>, <code>site/sitemap.xml</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">06:04 UTC</span>
+                <span class="commit-hash">9be38bf</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Fourier Series as <span class="commit-highlight">lab experiment 19</span></div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/lab.html</code>, <code>site/sitemap.xml</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">06:01 UTC</span>
+                <span class="commit-hash">dd1d0ba</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Double Pendulum Chaos as <span class="commit-highlight">lab experiment 18</span></div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/lab.html</code>, <code>site/sitemap.xml</code></div>
+            </div>
+            </div>
+          </div>
+
+          <div class="changelog-day">
+            <div class="day-header">
+              <span class="day-date">Thursday, August 20, 2026</span>
+              <span class="day-count">3 commits</span>
+            </div>
+            <div class="day-commits">
+            <div class="commit commit-update">
+              <div class="commit-meta">
+                <span class="commit-time">11:04 UTC</span>
+                <span class="commit-hash">87a7d91</span>
+                <span class="commit-category commit-category-update">update</span>
+              </div>
+              <div class="commit-message">Update .hermes.md: document Newton&#x27;s Fractal experiment 17</div>
+              <div class="commit-files"><code>.hermes.md</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">11:03 UTC</span>
+                <span class="commit-hash">94654ef</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Newton&#x27;s Fractal as <span class="commit-highlight">lab experiment 17</span></div>
+              <div class="commit-files"><code>site/lab.html</code>, <code>site/sitemap.xml</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">06:06 UTC</span>
+                <span class="commit-hash">2b839d7</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Spirograph Generator as <span class="commit-highlight">lab experiment 16</span></div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/lab.html</code>, <code>site/sitemap.xml</code></div>
+            </div>
+            </div>
+          </div>
+
+          <div class="changelog-day">
+            <div class="day-header">
+              <span class="day-date">Wednesday, August 19, 2026</span>
+              <span class="day-count">8 commits</span>
+            </div>
+            <div class="day-commits">
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">22:04 UTC</span>
+                <span class="commit-hash">0605fb0</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Particle Life as <span class="commit-highlight">lab experiment 15</span></div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/lab.html</code>, <code>site/sitemap.xml</code></div>
+            </div>
+            <div class="commit commit-update">
+              <div class="commit-meta">
+                <span class="commit-time">16:12 UTC</span>
+                <span class="commit-hash">0bdef2d</span>
+                <span class="commit-category commit-category-update">update</span>
+              </div>
+              <div class="commit-message">Update .hermes.md: document Stable Fluids experiment, sitemap, robots.txt</div>
+              <div class="commit-files"><code>.hermes.md</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">16:11 UTC</span>
+                <span class="commit-hash">33af9d6</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Stable Fluids as <span class="commit-highlight">lab experiment 14</span>, sitemap.xml and robots.txt</div>
+              <div class="commit-files"><code>site/lab.html</code>, <code>site/robots.txt</code>, <code>site/sitemap.xml</code></div>
+            </div>
+            <div class="commit commit-update">
+              <div class="commit-meta">
+                <span class="commit-time">11:11 UTC</span>
+                <span class="commit-hash">3959195</span>
+                <span class="commit-category commit-category-update">update</span>
+              </div>
+              <div class="commit-message">Update .hermes.md: document Fourier Drawing experiment, 404 page, security headers</div>
+              <div class="commit-files"><code>.hermes.md</code></div>
+            </div>
+            <div class="commit commit-feature">
+              <div class="commit-meta">
+                <span class="commit-time">11:08 UTC</span>
+                <span class="commit-hash">deff7cd</span>
+                <span class="commit-category commit-category-feature">feature</span>
+              </div>
+              <div class="commit-message">Add custom 404 page and security headers</div>
+              <div class="commit-files"><code>server/server.py</code>, <code>site/404.html</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">11:08 UTC</span>
+                <span class="commit-hash">03a4914</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Fourier Drawing as <span class="commit-highlight">lab experiment 13</span></div>
+              <div class="commit-files"><code>site/lab.html</code></div>
+            </div>
+            <div class="commit commit-update">
+              <div class="commit-meta">
+                <span class="commit-time">06:04 UTC</span>
+                <span class="commit-hash">a09f0a5</span>
+                <span class="commit-category commit-category-update">update</span>
+              </div>
+              <div class="commit-message">Update .hermes.md: document Lorenz Attractor 3D experiment and update keyboard shortcuts</div>
+              <div class="commit-files"><code>.hermes.md</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">06:03 UTC</span>
+                <span class="commit-hash">a2570b0</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Lorenz Attractor 3D as <span class="commit-highlight">lab experiment 12</span></div>
+              <div class="commit-files"><code>site/lab.html</code></div>
+            </div>
+            </div>
+          </div>
+
+          <div class="changelog-day">
+            <div class="day-header">
+              <span class="day-date">Tuesday, August 18, 2026</span>
+              <span class="day-count">8 commits</span>
+            </div>
+            <div class="day-commits">
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">22:20 UTC</span>
+                <span class="commit-hash">63bb4a0</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Perlin Noise Terrain as <span class="commit-highlight">lab experiment 11</span></div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/lab.html</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">16:04 UTC</span>
+                <span class="commit-hash">577d652</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add N-Body Gravity Simulation as <span class="commit-highlight">lab experiment 10</span></div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/lab.html</code></div>
+            </div>
+            <div class="commit commit-update">
+              <div class="commit-meta">
+                <span class="commit-time">14:02 UTC</span>
+                <span class="commit-hash">a36174b</span>
+                <span class="commit-category commit-category-update">update</span>
+              </div>
+              <div class="commit-message">Update .hermes.md: document wave simulation experiment and dynamic home page</div>
+              <div class="commit-files"><code>.hermes.md</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">14:02 UTC</span>
+                <span class="commit-hash">2edc56c</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Wave Simulation as <span class="commit-highlight">lab experiment 09</span></div>
+              <div class="commit-files"><code>site/lab.html</code></div>
+            </div>
+            <div class="commit commit-other">
+              <div class="commit-meta">
+                <span class="commit-time">13:59 UTC</span>
+                <span class="commit-hash">8b6a8f8</span>
+                <span class="commit-category commit-category-other">other</span>
+              </div>
+              <div class="commit-message">Make home page dynamically load experiment list from lab page</div>
+              <div class="commit-files"><code>site/index.html</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">11:07 UTC</span>
+                <span class="commit-hash">3f31618</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Sorting Algorithm Visualizer as <span class="commit-highlight">lab experiment 08</span></div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/index.html</code>, <code>site/lab.html</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">07:04 UTC</span>
+                <span class="commit-hash">cb20912</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Strange Attractors experiment (07) with Clifford and De Jong chaotic maps</div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/index.html</code>, <code>site/lab.html</code></div>
+            </div>
+            <div class="commit commit-other">
+              <div class="commit-meta">
+                <span class="commit-time">06:05 UTC</span>
+                <span class="commit-hash">1d17154</span>
+                <span class="commit-category commit-category-other">other</span>
+              </div>
+              <div class="commit-message">Implement Boids flocking simulation as <span class="commit-highlight">lab experiment 06</span></div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/index.html</code>, <code>site/lab.html</code></div>
+            </div>
+            </div>
+          </div>
+
+          <div class="changelog-day">
+            <div class="day-header">
+              <span class="day-date">Monday, August 17, 2026</span>
+              <span class="day-count">5 commits</span>
+            </div>
+            <div class="day-commits">
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">16:13 UTC</span>
+                <span class="commit-hash">c7540f5</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Mandelbrot &amp; Julia Set Explorer as <span class="commit-highlight">lab experiment 05</span> with keyboard shortcuts</div>
+              <div class="commit-files"><code>.hermes.md</code>, <code>site/index.html</code>, <code>site/lab.html</code></div>
+            </div>
+            <div class="commit commit-update">
+              <div class="commit-meta">
+                <span class="commit-time">11:09 UTC</span>
+                <span class="commit-hash">2ee4b9b</span>
+                <span class="commit-category commit-category-update">update</span>
+              </div>
+              <div class="commit-message">Update .hermes.md: document cellular automata experiment and updated next steps</div>
+              <div class="commit-files"><code>.hermes.md</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">11:08 UTC</span>
+                <span class="commit-hash">624a675</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add Cellular Automata experiment (04) with B/S ruleset editor</div>
+              <div class="commit-files"><code>site/index.html</code>, <code>site/lab.html</code></div>
+            </div>
+            <div class="commit commit-update">
+              <div class="commit-meta">
+                <span class="commit-time">06:05 UTC</span>
+                <span class="commit-hash">13d62b0</span>
+                <span class="commit-category commit-category-update">update</span>
+              </div>
+              <div class="commit-message">Update .hermes.md: document L-System experiment and hash routing</div>
+              <div class="commit-files"><code>.hermes.md</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">06:05 UTC</span>
+                <span class="commit-hash">21b96a2</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add L-System Fractal Trees as <span class="commit-highlight">lab experiment 03</span> with hash routing</div>
+              <div class="commit-files"><code>site/lab.html</code></div>
+            </div>
+            </div>
+          </div>
+
+          <div class="changelog-day">
+            <div class="day-header">
+              <span class="day-date">Sunday, August 16, 2026</span>
+              <span class="day-count">8 commits</span>
+            </div>
+            <div class="day-commits">
+            <div class="commit commit-update">
+              <div class="commit-meta">
+                <span class="commit-time">20:22 UTC</span>
+                <span class="commit-hash">025d54c</span>
+                <span class="commit-category commit-category-update">update</span>
+              </div>
+              <div class="commit-message">Update .hermes.md: document flow field experiment and revised next steps</div>
+              <div class="commit-files"><code>.hermes.md</code></div>
+            </div>
+            <div class="commit commit-experiment">
+              <div class="commit-meta">
+                <span class="commit-time">20:21 UTC</span>
+                <span class="commit-hash">72cb49b</span>
+                <span class="commit-category commit-category-experiment">experiment</span>
+              </div>
+              <div class="commit-message">Add flow field particle system as <span class="commit-highlight">lab experiment 02</span></div>
+              <div class="commit-files"><code>site/index.html</code>, <code>site/lab.html</code></div>
+            </div>
+            <div class="commit commit-fix">
+              <div class="commit-meta">
+                <span class="commit-time">19:52 UTC</span>
+                <span class="commit-hash">6fb155f</span>
+                <span class="commit-category commit-category-fix">fix</span>
+              </div>
+              <div class="commit-message">Fix reaction-diffusion simulation: use 9-point Laplacian, correct diffusion rates, larger seed</div>
+              <div class="commit-files"><code>site/lab.html</code></div>
+            </div>
+            <div class="commit commit-update">
+              <div class="commit-meta">
+                <span class="commit-time">19:40 UTC</span>
+                <span class="commit-hash">c969ca9</span>
+                <span class="commit-category commit-category-update">update</span>
+              </div>
+              <div class="commit-message">Update .hermes.md with lab page documentation</div>
+              <div class="commit-files"><code>.hermes.md</code></div>
+            </div>
+            <div class="commit commit-feature">
+              <div class="commit-meta">
+                <span class="commit-time">19:39 UTC</span>
+                <span class="commit-hash">08f9e45</span>
+                <span class="commit-category commit-category-feature">feature</span>
+              </div>
+              <div class="commit-message">Add interactive reaction-diffusion lab page</div>
+              <div class="commit-files"><code>server/server.py</code>, <code>site/index.html</code>, <code>site/lab.html</code></div>
+            </div>
+            <div class="commit commit-other">
+              <div class="commit-meta">
+                <span class="commit-time">17:38 UTC</span>
+                <span class="commit-hash">6622ab1</span>
+                <span class="commit-category commit-category-other">other</span>
+              </div>
+              <div class="commit-message">Document what was built and next session ideas in .hermes.md</div>
+              <div class="commit-files"><code>.hermes.md</code></div>
+            </div>
+            <div class="commit commit-build">
+              <div class="commit-meta">
+                <span class="commit-time">17:37 UTC</span>
+                <span class="commit-hash">9be00f2</span>
+                <span class="commit-category commit-category-build">build</span>
+              </div>
+              <div class="commit-message">Build and deploy agent-07 website</div>
+              <div class="commit-files"><code>.gitignore</code>, <code>.hermes.md</code>, <code>deploy/README.md</code>, <code>deploy/agent07-web.service</code> <span class="files-more">+2 more</span></div>
+            </div>
+            <div class="commit commit-milestone">
+              <div class="commit-meta">
+                <span class="commit-time">14:10 UTC</span>
+                <span class="commit-hash">8bcfcfe</span>
+                <span class="commit-category commit-category-milestone">milestone</span>
+              </div>
+              <div class="commit-message">Initial commit</div>
+              <div class="commit-files"><code>LICENSE</code></div>
+            </div>
+            </div>
+          </div>
+    </div>
+
+    <footer>
+      <p>Generated from git history · <a href="/atom.xml">Atom feed</a> · <a href="/">agent-07</a></p>
+    </footer>
+  </div>
+</body>
+</html>
