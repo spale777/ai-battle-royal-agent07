@@ -154,46 +154,86 @@ class AgentHandler(http.server.SimpleHTTPRequestHandler):
         super().__init__(*args, directory=str(SITE_DIR), **kwargs)
 
     def end_headers(self):
-        """Add security headers to all responses."""
+        """Add security and caching headers to all responses."""
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("X-Frame-Options", "DENY")
         self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
         self.send_header("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
+        # Content-Security-Policy: allow inline scripts/styles (used heavily
+        # in the single-file lab.html), images via data: URIs, and nothing
+        # from external origins — the site is fully self-contained.
+        csp = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline'; "
+            "style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data: blob:; "
+            "font-src 'self'; "
+            "connect-src 'self'; "
+            "frame-ancestors 'none'; "
+            "base-uri 'self'; "
+            "form-action 'self'"
+        )
+        self.send_header("Content-Security-Policy", csp)
+        # Cache-Control for static assets: HTML and API responses should
+        # not be cached (prevents stale lab.html during development, ensures
+        # visitors always get the latest version). Other static assets
+        # (images, fonts, sitemap) get a 1-hour cache window.
+        clean = self.path.split("?")[0].split("#")[0]
+        if clean.endswith(".html") or clean.endswith("/lab") or clean.endswith("/changelog") \
+                or "." not in os.path.basename(clean) or "/api/" in clean:
+            self.send_header("Cache-Control", "no-cache, must-revalidate")
+        else:
+            self.send_header("Cache-Control", "public, max-age=3600")
         super().end_headers()
 
     def do_GET(self):
+        self._handle_request(head=False)
+
+    def do_HEAD(self):
+        self._handle_request(head=True)
+
+    def _handle_request(self, head=False):
+        """Route API and clean-URL requests; delegate static files to parent."""
         if self.path == "/api/status":
-            self.handle_api_status()
+            self.handle_api_status(head=head)
         elif self.path == "/api/health":
-            self.handle_health()
+            self.handle_health(head=head)
         elif self.path == "/lab":
             # Clean URL: /lab -> /lab.html
             self.path = "/lab.html"
-            super().do_GET()
+            if head:
+                super().do_HEAD()
+            else:
+                super().do_GET()
         elif self.path == "/changelog":
             # Clean URL: /changelog -> /changelog.html
             self.path = "/changelog.html"
-            super().do_GET()
+            if head:
+                super().do_HEAD()
+            else:
+                super().do_GET()
         elif self.path == "/atom.xml":
             # Serve Atom feed with correct content type
             self.send_response(200)
             self.send_header("Content-Type", "application/atom+xml; charset=utf-8")
-            self.send_header("Cache-Control", "no-cache")
             self.end_headers()
-            try:
-                with open(SITE_DIR / "atom.xml", "rb") as f:
-                    self.wfile.write(f.read())
-            except Exception:
-                self.send_error(404)
+            if not head:
+                try:
+                    with open(SITE_DIR / "atom.xml", "rb") as f:
+                        self.wfile.write(f.read())
+                except Exception:
+                    pass
         else:
-            super().do_GET()
+            if head:
+                super().do_HEAD()
+            else:
+                super().do_GET()
 
     def send_error(self, code, message=None, explain=None):
         """Serve custom 404 page instead of default error page."""
         if code == 404:
             self.send_response(404)
             self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Cache-Control", "no-cache")
             self.end_headers()
             try:
                 with open(SITE_DIR / "404.html", "rb") as f:
@@ -203,20 +243,25 @@ class AgentHandler(http.server.SimpleHTTPRequestHandler):
         else:
             super().send_error(code, message, explain)
 
-    def handle_api_status(self):
+    def handle_api_status(self, head=False):
         data = get_status_data()
+        body = json.dumps(data, indent=2).encode()
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
-        self.send_header("Cache-Control", "no-cache")
         self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Content-Length", str(len(body)))
         self.end_headers()
-        self.wfile.write(json.dumps(data, indent=2).encode())
+        if not head:
+            self.wfile.write(body)
 
-    def handle_health(self):
+    def handle_health(self, head=False):
+        body = json.dumps({"status": "ok"}).encode()
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
         self.end_headers()
-        self.wfile.write(json.dumps({"status": "ok"}).encode())
+        if not head:
+            self.wfile.write(body)
 
     def log_message(self, format, *args):
         # Minimal logging

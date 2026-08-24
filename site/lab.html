@@ -4184,7 +4184,7 @@
       const val = v[i];
       const hue = (hueOffset + val * 280) % 360;
       const lum = Math.max(0, Math.min(100, val * 120));
-      const rgb = hslToRgb(hue / 360, saturation / 100, lum / 100);
+      const rgb = hslToRgb(hue, saturation / 100, lum / 100);
 
       const j = i * 4;
       data[j] = rgb[0];
@@ -4196,6 +4196,7 @@
   }
 
   function hslToRgb(h, s, l) {
+    h = h / 360;
     let r, g, b;
     if (s === 0) {
       r = g = b = l;
@@ -5126,7 +5127,7 @@
     // 3: Rainbow — smooth hue cycling
     function(t) {
       const hue = (t * 360) % 360;
-      const c = hslToRgb(hue / 360, 0.9, t < 0.05 ? 0 : 0.5);
+      const c = hslToRgb(hue, 0.9, t < 0.05 ? 0 : 0.5);
       return c;
     },
     // 4: Grayscale — black→white
@@ -6553,7 +6554,7 @@
     spectrum: (h, hue) => {
       const t = (h + 1) * 0.5;
       const angle = (hue + t * 180) % 360;
-      return hslToRgb(angle / 360, 0.7, 0.3 + t * 0.3);
+      return hslToRgb(angle, 0.7, 0.3 + t * 0.3);
     },
     mono: (h) => {
       const t = (h + 1) * 0.5;
@@ -6561,28 +6562,6 @@
       return [v, v, v];
     },
   };
-
-  function hslToRgb(h, s, l) {
-    let r, g, b;
-    if (s === 0) {
-      r = g = b = l;
-    } else {
-      const hue2rgb = (p, q, t) => {
-        if (t < 0) t += 1;
-        if (t > 1) t -= 1;
-        if (t < 1/6) return p + (q - p) * 6 * t;
-        if (t < 1/2) return q;
-        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-        return p;
-      };
-      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-      const p = 2 * l - q;
-      r = hue2rgb(p, q, h + 1/3);
-      g = hue2rgb(p, q, h);
-      b = hue2rgb(p, q, h - 1/3);
-    }
-    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
-  }
 
   function waveInit() {
     waveNow.fill(0);
@@ -7272,7 +7251,6 @@
   // Initialize
   nbInit();
 
-
   // ============================================================
   //  EXPERIMENT 11 — Perlin Noise Terrain
   // ============================================================
@@ -7629,7 +7607,6 @@
   // Initialize
   ptRegenerate(ptSeed);
 
-
   // ============================================================
   //  EXPERIMENT 12 — Lorenz Attractor 3D
   // ============================================================
@@ -7981,7 +7958,6 @@
   });
   // Set initial preset stat
   document.getElementById('la-preset-stat').textContent = 'classic';
-
 
   // ============================================================
   //  EXPERIMENT 13 — Fourier Drawing
@@ -8394,7 +8370,6 @@
 
   // Initialize with heart preset
   fdSetPath(fdPresetPaths.heart);
-
 
   // ============================================================
   //  EXPERIMENT 14 — Stable Fluids (Jos Stam's stable fluid solver)
@@ -8853,7 +8828,6 @@
   sfApplyPreset('ink');
   sfSeedPreset();
 
-
   // ============================================================
   //  EXPERIMENT 15 — Particle Life
   // ============================================================
@@ -9272,7 +9246,6 @@
   plReset();
   plApplyPreset('default');
 
-
   // ============================================================
   //  EXPERIMENT 16 — Spirograph / Hypotrochoid Generator
   // ============================================================
@@ -9542,7 +9515,6 @@
   // Initialize
   spReset();
 
-
   // ============================================================
   //  EXPERIMENT 17 — Newton's Fractal
   //  Newton's method on complex polynomials, colored by root
@@ -9681,29 +9653,6 @@
       return [g, g, g];
     }
   };
-
-  function hslToRgb(h, s, l) {
-    h = h / 360;
-    let r, g2, b;
-    if (s === 0) {
-      r = g2 = b = l;
-    } else {
-      const hue2rgb = function(p, q, t) {
-        if (t < 0) t += 1;
-        if (t > 1) t -= 1;
-        if (t < 1/6) return p + (q - p) * 6 * t;
-        if (t < 1/2) return q;
-        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-        return p;
-      };
-      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-      const p = 2 * l - q;
-      r = hue2rgb(p, q, h + 1/3);
-      g2 = hue2rgb(p, q, h);
-      b = hue2rgb(p, q, h - 1/3);
-    }
-    return [Math.round(r * 255), Math.round(g2 * 255), Math.round(b * 255)];
-  }
 
   // Progressive rendering — render in chunks across frames
   function nfRenderChunk() {
@@ -9929,7 +9878,6 @@
   // Initialize
   nfComputeRoots();
   nfFullRender();
-
 
   // ============================================================
   //  EXPERIMENT 18 — Double Pendulum Chaos
@@ -10385,7 +10333,6 @@
   dpCtx.fillRect(0, 0, dpW, dpH);
   dpApplyPreset('single');
 
-
   // ============================================================
   //  EXPERIMENT 19 — Fourier Series
   //  Visualizes the partial sums of Fourier series for standard
@@ -10761,7 +10708,6 @@
   // Initialize
   fsApplyPreset('square');
 
-
   // ============================================================
   //  EXPERIMENT 20 — Barnsley Fern & IFS Fractals
   //  Chaos game: iterated function systems with affine transforms
@@ -11100,7 +11046,6 @@
   // Initialize
   ifsApplyPreset('fern');
 
-
   // ============================================================
   //  EXPERIMENT 21 — Wolfram Elementary Cellular Automata
   //  1D cellular automaton with scrolling display
@@ -11413,7 +11358,6 @@
 
   // Initialize
   wcaReset();
-
 
   // ============================================================
   //  EXPERIMENT 22 — Physarum Slime Mold
@@ -11758,7 +11702,6 @@
   // Initialize
   pmInit();
   pmRender();
-
 
   // ============================================================
   //  EXPERIMENT 23 — Belousov-Zhabotinsky (Barkley Model)
@@ -12322,7 +12265,6 @@
   // Initialize
   bzInit();
 
-
   // ============================================================
   //  EXPERIMENT 24 — Lissajous Curves & Harmonograph
   // ============================================================
@@ -12638,7 +12580,6 @@
 
   // Initialize
   ljInit();
-
 
   // ============================================================
   //  EXPERIMENT 25 — Voronoi Diagram Explorer (JFA)
@@ -15077,30 +15018,7 @@
     } else {
       hue = 0; sat = 0; light = 50;
     }
-    return hslToRgb(hue, sat, light);
-  }
-
-  function hslToRgb(h, s, l) {
-    h /= 360; s /= 100; l /= 100;
-    var r, g, b;
-    if (s === 0) {
-      r = g = b = l;
-    } else {
-      var hue2rgb = function(p, q, t) {
-        if (t < 0) t += 1;
-        if (t > 1) t -= 1;
-        if (t < 1/6) return p + (q - p) * 6 * t;
-        if (t < 1/2) return q;
-        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-        return p;
-      };
-      var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-      var p = 2 * l - q;
-      r = hue2rgb(p, q, h + 1/3);
-      g = hue2rgb(p, q, h);
-      b = hue2rgb(p, q, h - 1/3);
-    }
-    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+    return hslToRgb(hue, sat / 100, light / 100);
   }
 
   // Pre-compute color LUT for speed
@@ -15651,7 +15569,7 @@
     } else {
       hue = 0; sat = 0; light = 50;
     }
-    var rgb = hslToRgb(hue, sat, light);
+    var rgb = hslToRgb(hue, sat / 100, light / 100);
     return 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
   }
 
@@ -15699,7 +15617,7 @@
           } else {
             hue = 0; sat = 0; light = t * 80;
           }
-          rgb = hslToRgb(hue, sat, light);
+          rgb = hslToRgb(hue, sat / 100, light / 100);
         }
         var di = (py * cw + px) * 4;
         data[di] = rgb[0];
@@ -16312,14 +16230,18 @@
     var inTree = 1;
 
     while (inTree < mazeRows * mazeCols) {
-      // Pick a random unvisited cell
-      var sr, sc, tries = 0;
-      do {
-        sr = Math.floor(Math.random() * mazeRows);
-        sc = Math.floor(Math.random() * mazeCols);
-        tries++;
-      } while (mazeGrid[sr][sc].visited && tries < 1000);
-      if (mazeGrid[sr][sc].visited) break;
+      // Scan grid deterministically for unvisited cells (random scan fails
+      // when only 1 cell remains — ~9.5% miss rate at 1000 tries on 425 cells)
+      var sr = -1, sc = -1;
+      var unvisited = [];
+      for (var ur = 0; ur < mazeRows; ur++) {
+        for (var uc = 0; uc < mazeCols; uc++) {
+          if (!mazeGrid[ur][uc].visited) unvisited.push({ r: ur, c: uc });
+        }
+      }
+      if (unvisited.length === 0) break;
+      var pick = unvisited[Math.floor(Math.random() * unvisited.length)];
+      sr = pick.r; sc = pick.c;
 
       // Random walk until hitting the tree
       var path = [{ r: sr, c: sc }];
