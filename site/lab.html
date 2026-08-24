@@ -16560,7 +16560,8 @@
       var entry = pq.pop();
       var current = entry.item;
       var ck = current.r + ',' + current.c;
-      if (entry.p > (dist[ck] || Infinity)) continue;
+      var curDist = (ck in dist) ? dist[ck] : Infinity;
+      if (entry.p > curDist) continue;
       mazeFrontier = pq.items.map(function(e) { return e.item.r + ',' + e.item.c; });
       if (current === mazeGoalCell) {
         mazeReconstructPath(current);
@@ -16571,8 +16572,9 @@
       for (var i = 0; i < nbs.length; i++) {
         var nb = nbs[i];
         var nk = nb.r + ',' + nb.c;
-        var nd = (dist[ck] || 0) + 1;
-        if (nd < (dist[nk] || Infinity)) {
+        var nd = curDist + 1;
+        var oldDist = (nk in dist) ? dist[nk] : Infinity;
+        if (nd < oldDist) {
           dist[nk] = nd;
           mazeParents[nk] = ck;
           if (!(nk in mazeVisited)) {
@@ -16612,8 +16614,10 @@
       for (var i = 0; i < nbs.length; i++) {
         var nb = nbs[i];
         var nk = nb.r + ',' + nb.c;
-        var tentative = (gScore[ck] || Infinity) + 1;
-        if (tentative < (gScore[nk] || Infinity)) {
+        var gCur = (ck in gScore) ? gScore[ck] : Infinity;
+        var tentative = gCur + 1;
+        var gOld = (nk in gScore) ? gScore[nk] : Infinity;
+        if (tentative < gOld) {
           mazeParents[nk] = ck;
           gScore[nk] = tentative;
           if (!(nk in mazeVisited)) {
@@ -16819,11 +16823,20 @@
               mazeGrid[rr][cc].visited = false;
             }
           }
-          // Re-set start/goal if they were cleared (grid resize)
-          if (!mazeStartCell || !mazeGoalCell) {
-            mazeStartCell = mazeGrid[0][0];
-            mazeGoalCell = mazeGrid[mazeRows - 1][mazeCols - 1];
-          }
+          // Update start/goal to point at new grid cell objects
+          // (generators call mazeBuildGrid() which creates new cell objects,
+          // so old references point at the pre-generation grid)
+          var sr = mazeStartCell ? mazeStartCell.r : 0;
+          var sc = mazeStartCell ? mazeStartCell.c : 0;
+          var gr = mazeGoalCell ? mazeGoalCell.r : mazeRows - 1;
+          var gc = mazeGoalCell ? mazeGoalCell.c : mazeCols - 1;
+          // Clamp to grid bounds (handles resize)
+          sr = Math.min(sr, mazeRows - 1);
+          sc = Math.min(sc, mazeCols - 1);
+          gr = Math.min(gr, mazeRows - 1);
+          gc = Math.min(gc, mazeCols - 1);
+          mazeStartCell = mazeGrid[sr][sc];
+          mazeGoalCell = mazeGrid[gr][gc];
           mazeUpdateStatus('maze generated — ready to solve');
           break;
         }
@@ -17078,11 +17091,9 @@
 
     // Regenerate when grid size changes (on mouseup/change)
     document.getElementById('slider-maze-cols').addEventListener('change', function() {
-      mazeStartCell = null; mazeGoalCell = null;
       mazeStartGen();
     });
     document.getElementById('slider-maze-rows').addEventListener('change', function() {
-      mazeStartCell = null; mazeGoalCell = null;
       mazeStartGen();
     });
   }
