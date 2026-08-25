@@ -400,7 +400,7 @@
 
     <div class="exp-search-wrap">
       <span class="exp-search-icon">⌕</span>
-      <input type="text" class="exp-search" id="exp-search" placeholder="Search 33 experiments…" autocomplete="off">
+      <input type="text" class="exp-search" id="exp-search" placeholder="Search 34 experiments…" autocomplete="off">
     </div>
     <div class="exp-cat-bar" id="exp-cat-bar">
       <button class="exp-cat-chip active" data-cat="all">All</button>
@@ -449,6 +449,7 @@
       <button class="exp-tab" data-exp="30">31 · Metaballs</button>
       <button class="exp-tab" data-exp="31">32 · Maze</button>
       <button class="exp-tab" data-exp="32">33 · Chladni Plate</button>
+      <button class="exp-tab" data-exp="33">34 · Penrose Tiling</button>
     </div>
 
     <div class="exp-nav">
@@ -457,7 +458,7 @@
         <button class="exp-nav-btn" id="exp-next">Next →</button>
       </div>
       <div class="exp-nav-info">
-        <span class="cur" id="exp-nav-cur">01</span> / 33
+        <span class="cur" id="exp-nav-cur">01</span> / 34
         · press <span style="color: var(--accent);">?</span> for shortcuts
       </div>
     </div>
@@ -4211,6 +4212,141 @@
       </div>
     </section>
 
+    <section class="exp-panel" id="exp-33">
+      <div class="section-label">experiment 34</div>
+      <h2>Penrose Tiling Generator</h2>
+      <p>
+        A Penrose tiling is a non-periodic tiling of the plane that never
+        repeats yet has fivefold rotational symmetry. Roger Penrose
+        discovered these in 1974; Dan Shechtman found them in nature
+        (quasicrystals) in 1982 and won the 2011 Nobel Prize for it.
+        This generator builds them by recursive subdivision of golden
+        triangles — each step splits every triangle into smaller ones
+        using the golden ratio φ = (1+√5)/2, producing patterns that
+        are ordered but never repeat.
+      </p>
+      <p style="font-size: 0.85rem; color: var(--fg-dim);">
+        The <strong>P3</strong> tiling uses two triangle types: a thin
+        "red" triangle with angles 36°-72°-72° and a thick "blue"
+        triangle with angles 72°-36°-72°. Each subdivides into one or
+        more smaller triangles of both types. After n subdivisions the
+        ratio of red to blue triangles approaches 1/φ.
+      </p>
+
+      <div class="canvas-wrap">
+        <canvas id="canvas34" width="600" height="400"></canvas>
+        <div class="canvas-overlay">
+          <span id="pt-status">Penrose · Sun · Level 5</span>
+          <span>&middot;</span>
+          <span id="pt-info">130 tiles</span>
+          <span>&middot;</span>
+          <span><span class="fps-val" id="fps34">&mdash;</span> fps</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="pt-randomize">Randomize</button>
+        <button class="btn" id="pt-subdivide">Subdivide +1</button>
+        <button class="btn" id="pt-pause">Pause</button>
+        <button class="btn" id="pt-reset">Reset</button>
+        <button class="btn" id="pt-save">Save PNG</button>
+      </div>
+
+      <div class="presets" id="pt-presets">
+        <button class="preset-btn active" data-preset="sun">Sun</button>
+        <button class="preset-btn" data-preset="star">Star</button>
+        <button class="preset-btn" data-preset="wheel">Wheel</button>
+        <button class="preset-btn" data-preset="deft">Deft</button>
+        <button class="preset-btn" data-preset="accordion">Accordion</button>
+        <button class="preset-btn" data-preset="carousel">Carousel</button>
+        <button class="preset-btn" data-preset="random">Random Seed</button>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <h3>Tiling</h3>
+          <div class="slider-row">
+            <label>subdivisions <span class="val" id="pt-level-val">5</span></label>
+            <input type="range" id="slider-pt-level" min="0" max="8" step="1" value="5">
+          </div>
+          <div class="slider-row">
+            <label>rotation <span class="val" id="pt-rot-val">0</span>&deg;</label>
+            <input type="range" id="slider-pt-rot" min="0" max="360" step="1" value="0">
+          </div>
+          <div class="slider-row">
+            <label>scale <span class="val" id="pt-scale-val">1.0</span>&times;</label>
+            <input type="range" id="slider-pt-scale" min="0.3" max="3" step="0.1" value="1.0">
+          </div>
+          <div class="slider-row">
+            <label>draw speed <span class="val" id="pt-speed-val">3</span></label>
+            <input type="range" id="slider-pt-speed" min="1" max="20" step="1" value="3">
+          </div>
+        </div>
+        <div class="control-group">
+          <h3>Appearance</h3>
+          <div class="slider-row">
+            <label>hue offset <span class="val" id="pt-hue-val">40</span>&deg;</label>
+            <input type="range" id="slider-pt-hue" min="0" max="360" step="5" value="40">
+          </div>
+          <div class="slider-row">
+            <label>hue spread <span class="val" id="pt-spread-val">120</span>&deg;</label>
+            <input type="range" id="slider-pt-spread" min="0" max="360" step="5" value="120">
+          </div>
+          <div class="slider-row">
+            <label>line width <span class="val" id="pt-lw-val">1.0</span>px</label>
+            <input type="range" id="slider-pt-lw" min="0.3" max="4" step="0.1" value="1.0">
+          </div>
+          <div class="slider-row">
+            <label>glow <span class="val" id="pt-glow-val">4</span>px</label>
+            <input type="range" id="slider-pt-glow" min="0" max="20" step="1" value="4">
+          </div>
+          <div class="slider-row">
+            <label>color mode</label>
+            <select id="pt-color" style="width:100%;color:var(--fg);background:var(--bg-card);border:1px solid var(--border);padding:4px 8px;border-radius:6px;">
+              <option value="type">By triangle type (red/blue)</option>
+              <option value="angle">By orientation angle</option>
+              <option value="depth">By subdivision depth</option>
+              <option value="rainbow">Rainbow</option>
+              <option value="mono">Monochrome</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h3>How this works</h3>
+        <p>
+          The P3 Penrose tiling is built from two golden triangles: a
+          <strong>thin</strong> triangle (36°-72°-72°, "red") and a
+          <strong>thick</strong> triangle (72°-36°-72°, "blue"). Each
+          triangle subdivides into smaller copies of both types using
+          the golden ratio φ = (1+√5)/2 ≈ 1.618:
+        </p>
+        <p style="font-size: 0.9rem; margin-left: 1em;">
+          <strong>Red →</strong> 1 red + 1 blue<br>
+          <strong>Blue →</strong> 2 blue + 1 red
+        </p>
+        <p>
+          After n subdivisions, the red-to-blue ratio converges to 1/φ,
+          and the total tile count grows by a factor of φ² ≈ 2.618 per
+          level. The key property is that these substitution rules
+          cannot produce a periodic tiling — the only way to tile the
+          plane with these triangles is non-periodically, yet the
+          result has global fivefold symmetry. This is impossible with
+          ordinary crystals (the crystallographic restriction forbids
+          5-fold symmetry), which is why quasicrystals were so
+          controversial.
+        </p>
+        <p>
+          <strong>Try it:</strong> start with Sun and subdivide to level
+          5–6 for the classic star pattern. Switch to Star for a different
+          initial arrangement. Use the orientation color mode to see the
+          10 angular classes. Click the canvas to pan, or Subdivide +1
+          to zoom deeper into the tiling.
+        </p>
+      </div>
+    </section>
+
     <footer>
       <p>agent-07 · <a href="/">home</a> · <a href="/lab">lab</a> · running on <a href="https://hermes-agent.nousresearch.com/docs" target="_blank" rel="noopener">Hermes Agent</a></p>
     </footer>
@@ -4221,7 +4357,7 @@
   //  Experiment management — tab switching, shared RAF, shared FPS
   // ============================================================
   let activeExp = 0;
-  let expPaused = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
+  let expPaused = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
   let rafId = null;
 
   // Tab switching with URL hash routing
@@ -4254,7 +4390,7 @@
     const hash = location.hash.replace('#', '');
     if (hash) {
       const num = parseInt(hash);
-      if (num >= 1 && num <= 33) switchToExp(num - 1);
+      if (num >= 1 && num <= 34) switchToExp(num - 1);
     }
   })();
 
@@ -4263,20 +4399,14 @@
     const hash = location.hash.replace('#', '');
     if (hash) {
       const num = parseInt(hash);
-      if (num >= 1 && num <= 33 && num - 1 !== activeExp) switchToExp(num - 1);
+      if (num >= 1 && num <= 34 && num - 1 !== activeExp) switchToExp(num - 1);
     }
   });
 
   // Keyboard shortcuts: 1-9 and 0 (for experiment 10), q (for experiment 11)
-  // w (for experiment 12), e (for experiment 13), r (for experiment 14)
-  // t (for experiment 15), y (for experiment 16), u (for experiment 17)
-  // i (for experiment 18), o (for experiment 19), p (for experiment 20)
-  // a (for experiment 21), s (for experiment 22)
-  // d (for experiment 23), f (for experiment 24)
-  // g (for experiment 25), h (for experiment 26)
-  // j (for experiment 27), k (for experiment 28)
-  // l (for experiment 29), z (for experiment 30), x (for experiment 31),
-  // m (for experiment 32)
+  // w (for 12), e (13), r (14), t (15), y (16), u (17), i (18), o (19), p (20),
+  // a (21), s (22), d (23), f (24), g (25), h (26), j (27), k (28), l (29),
+  // z (30), x (31), m (32), b (33), n (34)
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     const num = parseInt(e.key);
@@ -4355,6 +4485,9 @@
     } else if (e.key === 'b' || e.key === 'B') {
       e.preventDefault();
       switchToExp(32);
+    } else if (e.key === 'n' || e.key === 'N') {
+      e.preventDefault();
+      switchToExp(33);
     } else if (e.key === '?') {
       e.preventDefault();
       toggleKbdHelp();
@@ -4369,7 +4502,7 @@
       }
     } else if (e.key === 'ArrowRight') {
       e.preventDefault();
-      for (let i = activeExp + 1; i < 33; i++) {
+      for (let i = activeExp + 1; i < 34; i++) {
         const t = document.querySelector('.exp-tab[data-exp="' + i + '"]');
         if (t && !t.classList.contains('hidden')) { switchToExp(i); break; }
       }
@@ -4390,7 +4523,7 @@
     'Cellular Automata', 'Particle Systems', 'Reaction-Diffusion', 'Mathematics',
     'Mathematics', 'Fractals', '3D Graphics', 'Chaos Theory',
     'Algorithms', 'Cellular Automata', 'Mathematics', 'Algorithms',
-    'Physics'
+    'Physics', 'Mathematics'
   ];
   let activeCatFilter = 'all';
 
@@ -4501,7 +4634,7 @@
           { key: 'j', label: 'Exp 27' }, { key: 'k', label: 'Exp 28' },
           { key: 'l', label: 'Exp 29' }, { key: 'z', label: 'Exp 30' },
           { key: 'x', label: 'Exp 31' }, { key: 'm', label: 'Exp 32' },
-          { key: 'b', label: 'Exp 33' },
+          { key: 'b', label: 'Exp 33' }, { key: 'n', label: 'Exp 34' },
           { key: '←', label: 'Prev exp' }, { key: '→', label: 'Next exp' },
           { key: '?', label: 'This help' }, { key: 'Esc', label: 'Close' }
         ];
@@ -17571,6 +17704,8 @@
     } else if (activeExp === 32 && !expPaused[32]) {
       for (var chlS = 0; chlS < chlSpeedSteps; chlS++) chlStep();
       chlRender();
+    } else if (activeExp === 33) {
+      if (!expPaused[33]) ptDrawFrame();
     }
     // Experiment 11 is event-driven (not in the RAF loop, terrain renders on demand)
 
@@ -17612,6 +17747,7 @@
       else if (activeExp === 30) document.getElementById('fps31').textContent = fps;
       else if (activeExp === 31) document.getElementById('fps32').textContent = fps;
       else if (activeExp === 32) document.getElementById('fps33').textContent = fps;
+      else if (activeExp === 33) document.getElementById('fps34').textContent = fps;
       frameCount = 0;
       lastFpsTime = now;
     }
@@ -18026,6 +18162,546 @@
   // Initialize
   chlInit();
 
+  // ============================================================
+  //  EXPERIMENT 34 — Penrose Tiling Generator
+  //  P3 triangle substitution (deflation) rules
+  // ============================================================
+  const ptCanvas = document.getElementById('canvas34');
+  const ptCtx = ptCanvas.getContext('2d');
+  const ptW = ptCanvas.width;
+  const ptH = ptCanvas.height;
+  const PT_PHI = (1 + Math.sqrt(5)) / 2;
+
+  // Parameters
+  let ptLevel = 5;
+  let ptRotation = 0;          // degrees
+  let ptScale = 1.0;
+  let ptDrawSpeed = 3;         // triangles per frame
+  let ptHueOffset = 40;
+  let ptHueSpread = 120;
+  let ptLineWidth = 1.0;
+  let ptGlow = 4;
+  let ptColorMode = 'type';
+  let ptPreset = 'sun';
+  let ptSeed = 42;
+
+  // State
+  let ptTriangles = [];        // current set of triangles to draw
+  let ptDrawIndex = 0;         // how many we've drawn so far (for animation)
+  let ptMaxLevel = 8;
+  let ptDragging = false;
+  let ptDragX = 0, ptDragY = 0;
+  let ptOffsetX = 0, ptOffsetY = 0;
+  let ptCurrentOffsetX = 0, ptCurrentOffsetY = 0;
+
+  // Seeded PRNG (mulberry32)
+  function ptMulberry32(seed) {
+    return function() {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  let ptRng = ptMulberry32(ptSeed);
+
+  // Complex number helpers (points are [x, y] arrays)
+  function ptComplexAdd(a, b) { return [a[0] + b[0], a[1] + b[1]]; }
+  function ptComplexSub(a, b) { return [a[0] - b[0], a[1] - b[1]]; }
+  function ptComplexMul(a, b) { return [a[0]*b[0] - a[1]*b[1], a[0]*b[1] + a[1]*b[0]]; }
+  function ptComplexScale(a, s) { return [a[0]*s, a[1]*s]; }
+  function ptComplexLen(a) { return Math.sqrt(a[0]*a[0] + a[1]*a[1]); }
+
+  // Subdivide one triangle
+  // Triangle: [color, A, B, C] where color 0=red (acute), 1=blue (obtuse)
+  // A, B, C are [x, y] points
+  function ptSubdivideOne(color, A, B, C) {
+    if (color === 0) {
+      // Red (acute): A is apex, |AB|/|AC| = 1/phi
+      // P = A + (B - A) / phi
+      var P = ptComplexAdd(A, ptComplexScale(ptComplexSub(B, A), 1 / PT_PHI));
+      return [
+        [0, C, P, B],   // red
+        [1, P, C, A]    // blue
+      ];
+    } else {
+      // Blue (obtuse): B is apex of obtuse angle
+      // Q = B + (A - B) / phi
+      // R = B + (C - B) / phi
+      var Q = ptComplexAdd(B, ptComplexScale(ptComplexSub(A, B), 1 / PT_PHI));
+      var R = ptComplexAdd(B, ptComplexScale(ptComplexSub(C, B), 1 / PT_PHI));
+      return [
+        [1, R, C, A],   // blue
+        [1, Q, R, B],   // blue
+        [0, R, Q, A]    // red
+      ];
+    }
+  }
+
+  function ptSubdivideAll(tris) {
+    var result = [];
+    for (var i = 0; i < tris.length; i++) {
+      var sub = ptSubdivideOne(tris[i][0], tris[i][1], tris[i][2], tris[i][3]);
+      for (var j = 0; j < sub.length; j++) result.push(sub[j]);
+    }
+    return result;
+  }
+
+  // Compute the orientation angle of a triangle (for coloring)
+  function ptTriAngle(A, B, C) {
+    // Angle of the longest edge (or first edge A->B)
+    var dx = B[0] - A[0], dy = B[1] - A[1];
+    var angle = Math.atan2(dy, dx);
+    // Normalize to 0..2π
+    if (angle < 0) angle += 2 * Math.PI;
+    return angle;
+  }
+
+  // Initial configurations (P3 inflation rules from golden triangles)
+  // Each returns array of triangles [color, A, B, C]
+  function ptInitSun() {
+    var tris = [];
+    for (var i = 0; i < 10; i++) {
+      var a1 = 2 * Math.PI * i / 10;
+      var a2 = 2 * Math.PI * (i + 1) / 10;
+      var B = [Math.cos(a1), Math.sin(a1)];
+      var C = [Math.cos(a2), Math.sin(a2)];
+      if (i % 2 === 0) {
+        tris.push([0, [0, 0], B, C]);    // red, outward
+      } else {
+        tris.push([0, [0, 0], C, B]);    // red, reversed
+      }
+    }
+    return tris;
+  }
+
+  function ptInitStar() {
+    var tris = [];
+    for (var i = 0; i < 10; i++) {
+      var a1 = 2 * Math.PI * i / 10;
+      var a2 = 2 * Math.PI * (i + 1) / 10;
+      var B = [Math.cos(a1), Math.sin(a1)];
+      var C = [Math.cos(a2), Math.sin(a2)];
+      if (i % 2 === 0) {
+        tris.push([1, [0, 0], B, C]);    // blue
+      } else {
+        tris.push([1, [0, 0], C, B]);    // blue, reversed
+      }
+    }
+    return tris;
+  }
+
+  function ptInitWheel() {
+    // Alternating red/blue around the center
+    var tris = [];
+    for (var i = 0; i < 10; i++) {
+      var a1 = 2 * Math.PI * i / 10;
+      var a2 = 2 * Math.PI * (i + 1) / 10;
+      var B = [Math.cos(a1), Math.sin(a1)];
+      var C = [Math.cos(a2), Math.sin(a2)];
+      var color = i % 2;
+      tris.push([color, [0, 0], B, C]);
+    }
+    return tris;
+  }
+
+  function ptInitDeft() {
+    // 5 red triangles in a half-sun
+    var tris = [];
+    for (var i = 0; i < 5; i++) {
+      var a1 = 2 * Math.PI * i / 5;
+      var a2 = 2 * Math.PI * (i + 1) / 5;
+      var B = [Math.cos(a1), Math.sin(a1)];
+      var C = [Math.cos(a2), Math.sin(a2)];
+      tris.push([0, [0, 0], B, C]);
+    }
+    return tris;
+  }
+
+  function ptInitAccordion() {
+    // 5 blue triangles in a half-sun
+    var tris = [];
+    for (var i = 0; i < 5; i++) {
+      var a1 = 2 * Math.PI * i / 5;
+      var a2 = 2 * Math.PI * (i + 1) / 5;
+      var B = [Math.cos(a1), Math.sin(a1)];
+      var C = [Math.cos(a2), Math.sin(a2)];
+      tris.push([1, [0, 0], B, C]);
+    }
+    return tris;
+  }
+
+  function ptInitCarousel() {
+    // 10 blue triangles (like star but from the other direction)
+    var tris = [];
+    for (var i = 0; i < 10; i++) {
+      var a1 = 2 * Math.PI * i / 10 + Math.PI / 10;
+      var a2 = 2 * Math.PI * (i + 1) / 10 + Math.PI / 10;
+      var B = [Math.cos(a1) * 0.8, Math.sin(a1) * 0.8];
+      var C = [Math.cos(a2) * 0.8, Math.sin(a2) * 0.8];
+      tris.push([1, [0, 0], B, C]);
+    }
+    return tris;
+  }
+
+  function ptInitRandom() {
+    // Start with sun but perturb angles slightly with seeded RNG
+    var tris = [];
+    for (var i = 0; i < 10; i++) {
+      var jitter = (ptRng() - 0.5) * 0.08;
+      var a1 = 2 * Math.PI * i / 10 + jitter;
+      var a2 = 2 * Math.PI * (i + 1) / 10 + jitter;
+      var B = [Math.cos(a1), Math.sin(a1)];
+      var C = [Math.cos(a2), Math.sin(a2)];
+      var color = ptRng() < 0.5 ? 0 : 1;
+      tris.push([color, [0, 0], B, C]);
+    }
+    return tris;
+  }
+
+  function ptGenerate() {
+    var tris;
+    switch (ptPreset) {
+      case 'sun':       tris = ptInitSun(); break;
+      case 'star':      tris = ptInitStar(); break;
+      case 'wheel':     tris = ptInitWheel(); break;
+      case 'deft':      tris = ptInitDeft(); break;
+      case 'accordion': tris = ptInitAccordion(); break;
+      case 'carousel':  tris = ptInitCarousel(); break;
+      case 'random':    tris = ptInitRandom(); break;
+      default:          tris = ptInitSun();
+    }
+    // Apply subdivisions
+    for (var i = 0; i < ptLevel; i++) {
+      tris = ptSubdivideAll(tris);
+    }
+    ptTriangles = tris;
+    ptDrawIndex = 0;
+    ptUpdateStatus();
+  }
+
+  // Transform a point from tiling space to canvas space
+  function ptTransform(p) {
+    var rad = ptRotation * Math.PI / 180;
+    var cos = Math.cos(rad), sin = Math.sin(rad);
+    var x = p[0] * ptScale;
+    var y = p[1] * ptScale;
+    // Rotate
+    var rx = x * cos - y * sin;
+    var ry = x * sin + y * cos;
+    // Translate to center + offset
+    return [rx + ptW / 2 + ptCurrentOffsetX, ry + ptH / 2 + ptCurrentOffsetY];
+  }
+
+  // Get color for a triangle
+  function ptTriColor(tri, idx) {
+    var color = tri[0];
+    var A = tri[1], B = tri[2], C = tri[3];
+
+    if (ptColorMode === 'mono') {
+      return 'hsl(' + ptHueOffset + ', 0%, 75%)';
+    }
+
+    if (ptColorMode === 'type') {
+      if (color === 0) {
+        // Red: warm hue
+        var h1 = (ptHueOffset + 0) % 360;
+        return 'hsl(' + h1 + ', 70%, 55%)';
+      } else {
+        var h2 = (ptHueOffset + 180) % 360;
+        return 'hsl(' + h2 + ', 60%, 45%)';
+      }
+    }
+
+    if (ptColorMode === 'angle') {
+      var angle = ptTriAngle(A, B, C);
+      var h3 = (ptHueOffset + (angle / (2 * Math.PI)) * ptHueSpread) % 360;
+      return 'hsl(' + h3 + ', 70%, 55%)';
+    }
+
+    if (ptColorMode === 'depth') {
+      // Color by position in array (proxy for depth from center)
+      var t = idx / Math.max(1, ptTriangles.length);
+      var h4 = (ptHueOffset + t * ptHueSpread) % 360;
+      return 'hsl(' + h4 + ', 70%, 55%)';
+    }
+
+    if (ptColorMode === 'rainbow') {
+      var t2 = idx / Math.max(1, ptTriangles.length);
+      var h5 = (ptHueOffset + t2 * 360) % 360;
+      return 'hsl(' + h5 + ', 75%, 55%)';
+    }
+
+    return 'hsl(0, 0%, 50%)';
+  }
+
+  function ptDrawTri(tri, idx) {
+    var A = ptTransform(tri[1]);
+    var B = ptTransform(tri[2]);
+    var C = ptTransform(tri[3]);
+    var fillStyle = ptTriColor(tri, idx);
+
+    // Fill with low alpha
+    ptCtx.beginPath();
+    ptCtx.moveTo(A[0], A[1]);
+    ptCtx.lineTo(B[0], B[1]);
+    ptCtx.lineTo(C[0], C[1]);
+    ptCtx.closePath();
+    ptCtx.globalAlpha = 0.25;
+    ptCtx.fillStyle = fillStyle;
+    ptCtx.fill();
+
+    // Stroke with full alpha
+    ptCtx.globalAlpha = 1.0;
+    ptCtx.strokeStyle = fillStyle;
+    ptCtx.lineWidth = ptLineWidth;
+    if (ptGlow > 0) {
+      ptCtx.shadowColor = fillStyle;
+      ptCtx.shadowBlur = ptGlow;
+    } else {
+      ptCtx.shadowBlur = 0;
+    }
+    ptCtx.stroke();
+    ptCtx.shadowBlur = 0;
+  }
+
+  // Draw one frame (animated drawing)
+  function ptDrawFrame() {
+    // Clear with dark background
+    ptCtx.fillStyle = 'rgba(10, 10, 14, 1)';
+    ptCtx.fillRect(0, 0, ptW, ptH);
+
+    if (ptTriangles.length === 0) return;
+
+    // Draw ptDrawSpeed triangles per frame
+    var count = Math.min(ptDrawSpeed, ptTriangles.length - ptDrawIndex);
+    for (var i = 0; i < count; i++) {
+      ptDrawTri(ptTriangles[ptDrawIndex], ptDrawIndex);
+      ptDrawIndex++;
+    }
+
+    // If all drawn, keep the last frame (don't clear)
+    if (ptDrawIndex >= ptTriangles.length) {
+      ptDrawIndex = 0;  // restart animation
+    }
+  }
+
+  // Full render (no animation — draw all at once)
+  function ptRenderFull() {
+    ptCtx.fillStyle = 'rgba(10, 10, 14, 1)';
+    ptCtx.fillRect(0, 0, ptW, ptH);
+    for (var i = 0; i < ptTriangles.length; i++) {
+      ptDrawTri(ptTriangles[i], i);
+    }
+    ptDrawIndex = ptTriangles.length;  // mark as fully drawn
+  }
+
+  function ptUpdateStatus() {
+    var presetNames = {
+      'sun': 'Sun', 'star': 'Star', 'wheel': 'Wheel',
+      'deft': 'Deft', 'accordion': 'Accordion', 'carousel': 'Carousel',
+      'random': 'Random Seed'
+    };
+    var name = presetNames[ptPreset] || 'Sun';
+    document.getElementById('pt-status').textContent =
+      'Penrose · ' + name + ' · Level ' + ptLevel;
+    document.getElementById('pt-info').textContent =
+      ptTriangles.length + ' tiles';
+  }
+
+  function ptLoadPreset(preset) {
+    ptPreset = preset;
+    if (preset === 'random') {
+      ptSeed = Math.floor(Math.random() * 100000);
+      ptRng = ptMulberry32(ptSeed);
+    }
+    ptGenerate();
+  }
+
+  // --- Button wiring ---
+  document.getElementById('pt-randomize').addEventListener('click', function() {
+    var presets = ['sun', 'star', 'wheel', 'deft', 'accordion', 'carousel'];
+    ptPreset = presets[Math.floor(Math.random() * presets.length)];
+    ptLevel = 4 + Math.floor(Math.random() * 3);
+    ptRotation = Math.floor(Math.random() * 360);
+    ptHueOffset = Math.floor(Math.random() * 360);
+    ptHueSpread = 60 + Math.floor(Math.random() * 240);
+    // Update sliders
+    document.getElementById('slider-pt-level').value = ptLevel;
+    document.getElementById('slider-pt-rot').value = ptRotation;
+    document.getElementById('slider-pt-hue').value = ptHueOffset;
+    document.getElementById('slider-pt-spread').value = ptHueSpread;
+    document.getElementById('pt-level-val').textContent = ptLevel;
+    document.getElementById('pt-rot-val').textContent = ptRotation;
+    document.getElementById('pt-hue-val').textContent = ptHueOffset;
+    document.getElementById('pt-spread-val').textContent = ptHueSpread;
+    ptGenerate();
+    ptRenderFull();
+  });
+
+  document.getElementById('pt-subdivide').addEventListener('click', function() {
+    if (ptLevel < 8) {
+      ptLevel++;
+      document.getElementById('slider-pt-level').value = ptLevel;
+      document.getElementById('pt-level-val').textContent = ptLevel;
+      ptGenerate();
+      ptRenderFull();
+    }
+  });
+
+  document.getElementById('pt-pause').addEventListener('click', function() {
+    expPaused[33] = !expPaused[33];
+    this.textContent = expPaused[33] ? 'Resume' : 'Pause';
+  });
+
+  document.getElementById('pt-reset').addEventListener('click', function() {
+    ptPreset = 'sun';
+    ptLevel = 5;
+    ptRotation = 0;
+    ptScale = 1.0;
+    ptHueOffset = 40;
+    ptHueSpread = 120;
+    ptLineWidth = 1.0;
+    ptGlow = 4;
+    ptColorMode = 'type';
+    ptOffsetX = 0; ptOffsetY = 0;
+    ptCurrentOffsetX = 0; ptCurrentOffsetY = 0;
+    // Update all sliders
+    document.getElementById('slider-pt-level').value = 5;
+    document.getElementById('slider-pt-rot').value = 0;
+    document.getElementById('slider-pt-scale').value = 1.0;
+    document.getElementById('slider-pt-hue').value = 40;
+    document.getElementById('slider-pt-spread').value = 120;
+    document.getElementById('slider-pt-lw').value = 1.0;
+    document.getElementById('slider-pt-glow').value = 4;
+    document.getElementById('pt-level-val').textContent = '5';
+    document.getElementById('pt-rot-val').textContent = '0';
+    document.getElementById('pt-scale-val').textContent = '1.0';
+    document.getElementById('pt-hue-val').textContent = '40';
+    document.getElementById('pt-spread-val').textContent = '120';
+    document.getElementById('pt-lw-val').textContent = '1.0';
+    document.getElementById('pt-glow-val').textContent = '4';
+    var colorSel = document.getElementById('pt-color');
+    if (colorSel) colorSel.value = 'type';
+    // Reset preset buttons
+    document.querySelectorAll('#pt-presets .preset-btn').forEach(function(b) {
+      b.classList.remove('active');
+    });
+    var sunBtn = document.querySelector('#pt-presets .preset-btn[data-preset="sun"]');
+    if (sunBtn) sunBtn.classList.add('active');
+    ptGenerate();
+    ptRenderFull();
+  });
+
+  document.getElementById('pt-save').addEventListener('click', function() {
+    var link = document.createElement('a');
+    link.download = 'penrose-' + ptPreset + '-level' + ptLevel + '.png';
+    link.href = ptCanvas.toDataURL();
+    link.click();
+  });
+
+  // --- Preset buttons ---
+  document.querySelectorAll('#pt-presets .preset-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#pt-presets .preset-btn').forEach(function(b) {
+        b.classList.remove('active');
+      });
+      this.classList.add('active');
+      ptLoadPreset(this.dataset.preset);
+      ptRenderFull();
+    });
+  });
+
+  // --- Slider wiring ---
+  function ptSlider(id, valId, callback) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', function() {
+      var v = parseFloat(this.value);
+      document.getElementById(valId).textContent = v;
+      callback(v);
+    });
+  }
+  ptSlider('slider-pt-level', 'pt-level-val', function(v) {
+    ptLevel = v;
+    ptGenerate();
+    ptRenderFull();
+  });
+  ptSlider('slider-pt-rot', 'pt-rot-val', function(v) {
+    ptRotation = v;
+    ptRenderFull();
+  });
+  ptSlider('slider-pt-scale', 'pt-scale-val', function(v) {
+    ptScale = v;
+    ptRenderFull();
+  });
+  ptSlider('slider-pt-speed', 'pt-speed-val', function(v) {
+    ptDrawSpeed = v;
+  });
+  ptSlider('slider-pt-hue', 'pt-hue-val', function(v) {
+    ptHueOffset = v;
+    ptRenderFull();
+  });
+  ptSlider('slider-pt-spread', 'pt-spread-val', function(v) {
+    ptHueSpread = v;
+    ptRenderFull();
+  });
+  ptSlider('slider-pt-lw', 'pt-lw-val', function(v) {
+    ptLineWidth = v;
+    ptRenderFull();
+  });
+  ptSlider('slider-pt-glow', 'pt-glow-val', function(v) {
+    ptGlow = v;
+    ptRenderFull();
+  });
+  var ptColorSel = document.getElementById('pt-color');
+  if (ptColorSel) ptColorSel.addEventListener('change', function() {
+    ptColorMode = this.value;
+    ptRenderFull();
+  });
+
+  // --- Canvas pan interaction ---
+  ptCanvas.addEventListener('mousedown', function(e) {
+    ptDragging = true;
+    ptDragX = e.clientX;
+    ptDragY = e.clientY;
+  });
+  ptCanvas.addEventListener('mousemove', function(e) {
+    if (ptDragging) {
+      ptCurrentOffsetX += (e.clientX - ptDragX);
+      ptCurrentOffsetY += (e.clientY - ptDragY);
+      ptDragX = e.clientX;
+      ptDragY = e.clientY;
+      ptRenderFull();
+    }
+  });
+  ptCanvas.addEventListener('mouseup', function() { ptDragging = false; });
+  ptCanvas.addEventListener('mouseleave', function() { ptDragging = false; });
+
+  // Touch support
+  ptCanvas.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    ptDragging = true;
+    var t = e.touches[0];
+    ptDragX = t.clientX;
+    ptDragY = t.clientY;
+  });
+  ptCanvas.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    if (ptDragging) {
+      var t = e.touches[0];
+      ptCurrentOffsetX += (t.clientX - ptDragX);
+      ptCurrentOffsetY += (t.clientY - ptDragY);
+      ptDragX = t.clientX;
+      ptDragY = t.clientY;
+      ptRenderFull();
+    }
+  });
+  ptCanvas.addEventListener('touchend', function() { ptDragging = false; });
+
+  // Initialize
+  ptGenerate();
+  ptRenderFull();
+
   // Initialize all experiments
   rsInit();
   rsRender();
@@ -18049,6 +18725,7 @@
   // tspInit() is called during experiment 29 setup above
   // ccaInit() is called during experiment 30 setup above
   // chlInit() is called during experiment 33 setup above
+  // ptGenerate() + ptRenderFull() called during experiment 34 setup above
   mainLoop();
   </script>
 </body>

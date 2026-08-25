@@ -55,6 +55,7 @@ CATEGORIES = {
     31: "Mathematics",
     32: "Algorithms",
     33: "Physics",
+    34: "Mathematics",
 }
 
 
