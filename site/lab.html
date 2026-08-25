@@ -125,6 +125,24 @@
       color: var(--fg-dim); pointer-events: none; font-size: 14px;
     }
 
+    /* Category filter chips (lab page) */
+    .exp-cat-bar {
+      display: flex; flex-wrap: wrap; gap: 4px;
+      padding: 6px 10px; background: var(--bg-card);
+      border: 1px solid var(--border); border-top: none;
+      border-radius: 0 0 8px 8px; margin-bottom: 8px;
+    }
+    .exp-cat-chip {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+      padding: 3px 10px; border: none; border-radius: 100px;
+      background: transparent; color: var(--fg-dim);
+      cursor: pointer; transition: all 0.2s; user-select: none;
+    }
+    .exp-cat-chip:hover { color: var(--fg); background: var(--bg-elevated); }
+    .exp-cat-chip.active {
+      color: var(--accent); background: var(--accent-glow);
+    }
+
     /* Experiment tabs */
     .exp-tabs {
       display: flex; flex-wrap: wrap; gap: 2px; margin-bottom: 0;
@@ -383,6 +401,19 @@
     <div class="exp-search-wrap">
       <span class="exp-search-icon">⌕</span>
       <input type="text" class="exp-search" id="exp-search" placeholder="Search 33 experiments…" autocomplete="off">
+    </div>
+    <div class="exp-cat-bar" id="exp-cat-bar">
+      <button class="exp-cat-chip active" data-cat="all">All</button>
+      <button class="exp-cat-chip" data-cat="Mathematics">Math</button>
+      <button class="exp-cat-chip" data-cat="Fractals">Fractals</button>
+      <button class="exp-cat-chip" data-cat="Chaos Theory">Chaos</button>
+      <button class="exp-cat-chip" data-cat="Particle Systems">Particles</button>
+      <button class="exp-cat-chip" data-cat="Physics">Physics</button>
+      <button class="exp-cat-chip" data-cat="Algorithms">Algorithms</button>
+      <button class="exp-cat-chip" data-cat="Cellular Automata">CA</button>
+      <button class="exp-cat-chip" data-cat="Reaction-Diffusion">R-D</button>
+      <button class="exp-cat-chip" data-cat="3D Graphics">3D</button>
+      <button class="exp-cat-chip" data-cat="Generative Art">Gen Art</button>
     </div>
     <div class="exp-tabs" id="exp-tabs">
       <button class="exp-tab active" data-exp="0">01 · Reaction-Diffusion</button>
@@ -4332,38 +4363,62 @@
       if (overlay) overlay.classList.remove('active');
     } else if (e.key === 'ArrowLeft') {
       e.preventDefault();
-      if (activeExp > 0) switchToExp(activeExp - 1);
+      for (let i = activeExp - 1; i >= 0; i--) {
+        const t = document.querySelector('.exp-tab[data-exp="' + i + '"]');
+        if (t && !t.classList.contains('hidden')) { switchToExp(i); break; }
+      }
     } else if (e.key === 'ArrowRight') {
       e.preventDefault();
-      if (activeExp < 32) switchToExp(activeExp + 1);
+      for (let i = activeExp + 1; i < 33; i++) {
+        const t = document.querySelector('.exp-tab[data-exp="' + i + '"]');
+        if (t && !t.classList.contains('hidden')) { switchToExp(i); break; }
+      }
     }
   });
 
   // ============================================================
-  //  Experiment search/filter, prev/next nav, keyboard help
+  //  Experiment search/filter, category filter, prev/next nav, keyboard help
   // ============================================================
+
+  // Experiment-to-category mapping (experiment index -> category)
+  const expCategories = [
+    'Reaction-Diffusion', 'Particle Systems', 'Fractals', 'Cellular Automata',
+    'Fractals', 'Particle Systems', 'Chaos Theory', 'Algorithms',
+    'Physics', 'Physics', 'Generative Art', 'Chaos Theory',
+    'Mathematics', 'Physics', 'Particle Systems', 'Mathematics',
+    'Fractals', 'Chaos Theory', 'Mathematics', 'Fractals',
+    'Cellular Automata', 'Particle Systems', 'Reaction-Diffusion', 'Mathematics',
+    'Mathematics', 'Fractals', '3D Graphics', 'Chaos Theory',
+    'Algorithms', 'Cellular Automata', 'Mathematics', 'Algorithms',
+    'Physics'
+  ];
+  let activeCatFilter = 'all';
+
+  // Apply both text search and category filter
+  function applyFilters() {
+    const q = expSearch ? expSearch.value.toLowerCase().trim() : '';
+    document.querySelectorAll('.exp-tab').forEach(function(tab) {
+      const idx = parseInt(tab.dataset.exp);
+      const text = tab.textContent.toLowerCase();
+      // Also search the section title and description for richer results
+      const panel = document.getElementById('exp-' + tab.dataset.exp);
+      let extraText = '';
+      if (panel) {
+        const h2 = panel.querySelector('h2');
+        const ps = panel.querySelectorAll('p');
+        if (h2) extraText += ' ' + h2.textContent.toLowerCase();
+        ps.forEach(function(p) { extraText += ' ' + p.textContent.toLowerCase(); });
+      }
+      const textMatch = !q || text.includes(q) || extraText.includes(q);
+      const catMatch = activeCatFilter === 'all' || expCategories[idx] === activeCatFilter;
+      tab.classList.toggle('hidden', !(textMatch && catMatch));
+    });
+  }
 
   // Search/filter — filters tab list as you type
   const expSearch = document.getElementById('exp-search');
   if (expSearch) {
-    expSearch.addEventListener('input', function() {
-      const q = this.value.toLowerCase().trim();
-      document.querySelectorAll('.exp-tab').forEach(function(tab) {
-        const text = tab.textContent.toLowerCase();
-        const num = tab.dataset.exp;
-        // Also search the section title and description for richer results
-        const panel = document.getElementById('exp-' + num);
-        let extraText = '';
-        if (panel) {
-          const h2 = panel.querySelector('h2');
-          const ps = panel.querySelectorAll('p');
-          if (h2) extraText += ' ' + h2.textContent.toLowerCase();
-          ps.forEach(function(p) { extraText += ' ' + p.textContent.toLowerCase(); });
-        }
-        const match = !q || text.includes(q) || extraText.includes(q);
-        tab.classList.toggle('hidden', !match);
-      });
-    });
+    expSearch.addEventListener('input', applyFilters);
     // Enter key in search: jump to first visible tab
     expSearch.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
@@ -4375,20 +4430,49 @@
         }
       } else if (e.key === 'Escape') {
         this.value = '';
-        this.dispatchEvent(new Event('input'));
+        applyFilters();
         this.blur();
       }
     });
   }
 
-  // Prev/Next navigation
+  // Category filter chips
+  document.querySelectorAll('.exp-cat-chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      document.querySelectorAll('.exp-cat-chip').forEach(function(c) {
+        c.classList.remove('active');
+      });
+      this.classList.add('active');
+      activeCatFilter = this.dataset.cat;
+      applyFilters();
+      // If current experiment is hidden by filter, jump to first visible
+      const curTab = document.querySelector('.exp-tab[data-exp="' + activeExp + '"]');
+      if (curTab && curTab.classList.contains('hidden')) {
+        const firstVisible = document.querySelector('.exp-tab:not(.hidden)');
+        if (firstVisible) switchToExp(parseInt(firstVisible.dataset.exp));
+      }
+    });
+  });
+
+  // Prev/Next navigation (skips tabs hidden by category filter)
   const prevBtn = document.getElementById('exp-prev');
   const nextBtn = document.getElementById('exp-next');
+  function findVisibleNeighbor(dir) {
+    let i = activeExp + dir;
+    while (i >= 0 && i < 33) {
+      const tab = document.querySelector('.exp-tab[data-exp="' + i + '"]');
+      if (tab && !tab.classList.contains('hidden')) return i;
+      i += dir;
+    }
+    return -1;
+  }
   if (prevBtn) prevBtn.addEventListener('click', function() {
-    if (activeExp > 0) switchToExp(activeExp - 1);
+    const target = findVisibleNeighbor(-1);
+    if (target >= 0) switchToExp(target);
   });
   if (nextBtn) nextBtn.addEventListener('click', function() {
-    if (activeExp < 31) switchToExp(activeExp + 1);
+    const target = findVisibleNeighbor(1);
+    if (target >= 0) switchToExp(target);
   });
 
   // Keyboard shortcut help overlay

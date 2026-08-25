@@ -383,6 +383,51 @@
       to { opacity: 1; }
     }
 
+    /* Category filter chips */
+    .cat-chip {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      background: var(--bg-card);
+      color: var(--fg-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .cat-chip:hover { border-color: var(--border-bright); color: var(--fg); }
+    .cat-chip.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-glow);
+    }
+    .cat-chip .count {
+      opacity: 0.6;
+      margin-left: 4px;
+      font-size: 10px;
+    }
+
+    /* Experiment card metadata */
+    .card .cat-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-2);
+      margin-bottom: 8px;
+    }
+    .card .exp-desc {
+      font-size: 0.8rem;
+      color: var(--fg-dim);
+      margin-top: 4px;
+      margin-bottom: 0;
+      line-height: 1.5;
+    }
+
     /* Responsive */
     @media (max-width: 640px) {
       header { padding: 32px 0 48px; }
@@ -560,7 +605,11 @@
         no pre-rendered frames — every pixel is computed live. Adjust the
         parameters, move your mouse, and watch what emerges.
       </p>
-      <div class="card-grid" id="lab-cards" style="margin-top: 24px;">
+
+      <!-- Category filter chips -->
+      <div id="exp-categories" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px;"></div>
+
+      <div class="card-grid" id="lab-cards" style="margin-top: 16px;">
         <div class="card" style="text-align: center; color: var(--fg-dim);">
           <p>Loading experiments…</p>
         </div>
@@ -630,45 +679,81 @@
       }
     }
 
-    // Fetch the lab page and extract experiment names from tab buttons
+    // Fetch experiment metadata from the lightweight API endpoint
+    // (instead of downloading the full 685KB lab.html to parse tab names)
+    let allExperiments = [];
+    let activeCategory = 'all';
+
     async function loadLabExperiments() {
       try {
-        const res = await fetch('/lab.html');
-        if (!res.ok) throw new Error('lab page unavailable');
-        const html = await res.text();
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const tabs = doc.querySelectorAll('.exp-tab');
-        const experiments = [];
-        tabs.forEach((tab, i) => {
-          const text = tab.textContent.trim();
-          // Format: "01 · Reaction-Diffusion" → extract number and name
-          const match = text.match(/^(\d+)\s*·\s*(.+)$/);
-          if (match) {
-            experiments.push({ num: parseInt(match[1]), name: match[2], hash: String(match[1]).padStart(2, '0') });
-          }
-        });
+        const res = await fetch('/api/experiments');
+        if (!res.ok) throw new Error('experiments API unavailable');
+        const data = await res.json();
 
-        if (experiments.length === 0) throw new Error('no experiments found');
+        allExperiments = data.experiments || [];
+        const categories = data.categories || [];
 
         // Update intro paragraph with count
         const intro = document.getElementById('lab-intro');
-        const count = experiments.length;
-        intro.innerHTML = `Interactive generative art, computed live in your browser. The lab currently has <strong>${count} experiment${count !== 1 ? 's' : ''}</strong>. No video, no pre-rendered frames — every pixel is computed live. Adjust the parameters, move your mouse, and watch what emerges.`;
+        const count = data.total || allExperiments.length;
+        intro.innerHTML = `Interactive generative art, computed live in your browser. The lab currently has <strong>${count} experiment${count !== 1 ? 's' : ''}</strong> across ${categories.length} categories. No video, no pre-rendered frames — every pixel is computed live. Adjust the parameters, move your mouse, and watch what emerges.`;
 
-        // Render experiment cards
-        const cards = document.getElementById('lab-cards');
-        cards.innerHTML = experiments.map(exp => `
-          <a href="/lab#${exp.hash}" class="card" style="text-decoration: none; color: inherit; cursor: pointer;">
-            <div class="icon">${String(exp.num).padStart(2, '0')}</div>
-            <h3>${escapeHtml(exp.name)}</h3>
-            <p style="color: var(--fg-dim);">Open in lab →</p>
-          </a>
-        `).join('');
+        // Render category filter chips
+        const catContainer = document.getElementById('exp-categories');
+        catContainer.innerHTML = '';
+
+        // "All" chip
+        const allChip = document.createElement('button');
+        allChip.className = 'cat-chip active';
+        allChip.dataset.cat = 'all';
+        allChip.innerHTML = `All <span class="count">${count}</span>`;
+        allChip.onclick = () => filterByCategory('all');
+        catContainer.appendChild(allChip);
+
+        // Category chips
+        categories.forEach(cat => {
+          const chip = document.createElement('button');
+          chip.className = 'cat-chip';
+          chip.dataset.cat = cat.name;
+          chip.innerHTML = `${escapeHtml(cat.name)} <span class="count">${cat.count}</span>`;
+          chip.onclick = () => filterByCategory(cat.name);
+          catContainer.appendChild(chip);
+        });
+
+        renderExperimentCards(allExperiments);
       } catch (e) {
         const cards = document.getElementById('lab-cards');
         cards.innerHTML = '<div class="card"><p style="color: var(--fg-dim);">Lab experiments are available on the <a href="/lab" style="color: var(--accent);">lab page</a>.</p></div>';
       }
+    }
+
+    function filterByCategory(cat) {
+      activeCategory = cat;
+      // Update chip states
+      document.querySelectorAll('.cat-chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.cat === cat);
+      });
+      // Filter and render
+      const filtered = cat === 'all'
+        ? allExperiments
+        : allExperiments.filter(e => e.category === cat);
+      renderExperimentCards(filtered);
+    }
+
+    function renderExperimentCards(experiments) {
+      const cards = document.getElementById('lab-cards');
+      if (experiments.length === 0) {
+        cards.innerHTML = '<div class="card"><p style="color: var(--fg-dim);">No experiments in this category.</p></div>';
+        return;
+      }
+      cards.innerHTML = experiments.map(exp => `
+        <a href="/lab#${exp.hash}" class="card" style="text-decoration: none; color: inherit; cursor: pointer;">
+          <div class="icon">${exp.hash}</div>
+          <span class="cat-tag">${escapeHtml(exp.category)}</span>
+          <h3>${escapeHtml(exp.title)}</h3>
+          <p class="exp-desc">${escapeHtml(exp.description)}</p>
+        </a>
+      `).join('');
     }
 
     function escapeHtml(s) {
