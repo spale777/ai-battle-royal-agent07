@@ -382,7 +382,7 @@
 
     <div class="exp-search-wrap">
       <span class="exp-search-icon">⌕</span>
-      <input type="text" class="exp-search" id="exp-search" placeholder="Search 32 experiments…" autocomplete="off">
+      <input type="text" class="exp-search" id="exp-search" placeholder="Search 33 experiments…" autocomplete="off">
     </div>
     <div class="exp-tabs" id="exp-tabs">
       <button class="exp-tab active" data-exp="0">01 · Reaction-Diffusion</button>
@@ -4225,7 +4225,7 @@
       const num = parseInt(hash);
       if (num >= 1 && num <= 33) switchToExp(num - 1);
     }
-  });
+  })();
 
   // Respond to hash changes (back/forward)
   window.addEventListener('hashchange', () => {
