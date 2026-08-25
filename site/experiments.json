@@ -1,9 +1,9 @@
 {
-  "total": 33,
+  "total": 34,
   "categories": [
     {
       "name": "Mathematics",
-      "count": 6
+      "count": 7
     },
     {
       "name": "Fractals",
@@ -306,6 +306,14 @@
       "title": "Chladni Plate Patterns",
       "description": "When a metal plate sprinkled with sand is vibrated at a resonant frequency, the sand gathers along the nodal lines — places where the…",
       "category": "Physics"
+    },
+    {
+      "num": 34,
+      "hash": "34",
+      "tab": "Penrose Tiling",
+      "title": "Penrose Tiling Generator",
+      "description": "A Penrose tiling is a non-periodic tiling of the plane that never repeats yet has fivefold rotational symmetry. Roger Penrose discovered…",
+      "category": "Mathematics"
     }
   ]
 }
