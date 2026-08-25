@@ -1,0 +1,206 @@
+[
+  {
+    "num": 1,
+    "title": "Gray-Scott Reaction-Diffusion",
+    "file": "exp-01.js",
+    "size": 7986
+  },
+  {
+    "num": 2,
+    "title": "Flow Field Particles",
+    "file": "exp-02.js",
+    "size": 8337
+  },
+  {
+    "num": 3,
+    "title": "L-System Fractal Trees",
+    "file": "exp-03.js",
+    "size": 8051
+  },
+  {
+    "num": 4,
+    "title": "Cellular Automata (Life and variants)",
+    "file": "exp-04.js",
+    "size": 9068
+  },
+  {
+    "num": 5,
+    "title": "Mandelbrot & Julia Set Explorer",
+    "file": "exp-05.js",
+    "size": 14093
+  },
+  {
+    "num": 6,
+    "title": "Boids Flocking Simulation",
+    "file": "exp-06.js",
+    "size": 12133
+  },
+  {
+    "num": 7,
+    "title": "Strange Attractors",
+    "file": "exp-07.js",
+    "size": 6617
+  },
+  {
+    "num": 8,
+    "title": "Sorting Algorithm Visualizer",
+    "file": "exp-08.js",
+    "size": 13002
+  },
+  {
+    "num": 9,
+    "title": "Wave Simulation",
+    "file": "exp-09.js",
+    "size": 11011
+  },
+  {
+    "num": 10,
+    "title": "N-Body Gravity Simulation",
+    "file": "exp-10.js",
+    "size": 14490
+  },
+  {
+    "num": 11,
+    "title": "Perlin Noise Terrain",
+    "file": "exp-11.js",
+    "size": 13287
+  },
+  {
+    "num": 12,
+    "title": "Lorenz Attractor 3D",
+    "file": "exp-12.js",
+    "size": 13358
+  },
+  {
+    "num": 13,
+    "title": "Fourier Drawing",
+    "file": "exp-13.js",
+    "size": 13680
+  },
+  {
+    "num": 14,
+    "title": "Stable Fluids (Jos Stam's stable fluid solver)",
+    "file": "exp-14.js",
+    "size": 15725
+  },
+  {
+    "num": 15,
+    "title": "Particle Life",
+    "file": "exp-15.js",
+    "size": 14572
+  },
+  {
+    "num": 16,
+    "title": "Spirograph / Hypotrochoid Generator",
+    "file": "exp-16.js",
+    "size": 9679
+  },
+  {
+    "num": 17,
+    "title": "Newton's Fractal",
+    "file": "exp-17.js",
+    "size": 13211
+  },
+  {
+    "num": 18,
+    "title": "Double Pendulum Chaos",
+    "file": "exp-18.js",
+    "size": 15613
+  },
+  {
+    "num": 19,
+    "title": "Fourier Series",
+    "file": "exp-19.js",
+    "size": 12102
+  },
+  {
+    "num": 20,
+    "title": "Barnsley Fern & IFS Fractals",
+    "file": "exp-20.js",
+    "size": 11819
+  },
+  {
+    "num": 21,
+    "title": "Wolfram Elementary Cellular Automata",
+    "file": "exp-21.js",
+    "size": 10207
+  },
+  {
+    "num": 22,
+    "title": "Physarum Slime Mold",
+    "file": "exp-22.js",
+    "size": 12878
+  },
+  {
+    "num": 23,
+    "title": "Belousov-Zhabotinsky (Barkley Model)",
+    "file": "exp-23.js",
+    "size": 18670
+  },
+  {
+    "num": 24,
+    "title": "Lissajous Curves & Harmonograph",
+    "file": "exp-24.js",
+    "size": 11107
+  },
+  {
+    "num": 25,
+    "title": "Voronoi Diagram Explorer (JFA)",
+    "file": "exp-25.js",
+    "size": 23532
+  },
+  {
+    "num": 26,
+    "title": "Diffusion-Limited Aggregation (DLA)",
+    "file": "exp-26.js",
+    "size": 15295
+  },
+  {
+    "num": 27,
+    "title": "3D Wireframe Solids",
+    "file": "exp-27.js",
+    "size": 18598
+  },
+  {
+    "num": 28,
+    "title": "Logistic Map Bifurcation Diagram",
+    "file": "exp-28.js",
+    "size": 14005
+  },
+  {
+    "num": 29,
+    "title": "Traveling Salesman Problem (Simulated Annealing)",
+    "file": "exp-29.js",
+    "size": 12817
+  },
+  {
+    "num": 30,
+    "title": "Cyclic Cellular Automaton",
+    "file": "exp-30.js",
+    "size": 14039
+  },
+  {
+    "num": 31,
+    "title": "Marching Squares & Metaballs",
+    "file": "exp-31.js",
+    "size": 22732
+  },
+  {
+    "num": 32,
+    "title": "Maze Generation & Pathfinding",
+    "file": "exp-32.js",
+    "size": 31259
+  },
+  {
+    "num": 33,
+    "title": "Chladni Plate Patterns",
+    "file": "exp-33.js",
+    "size": 15673
+  },
+  {
+    "num": 34,
+    "title": "Penrose Tiling Generator",
+    "file": "exp-34.js",
+    "size": 17767
+  }
+]

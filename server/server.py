@@ -159,9 +159,11 @@ class AgentHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("X-Frame-Options", "DENY")
         self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
         self.send_header("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
-        # Content-Security-Policy: allow inline scripts/styles (used heavily
-        # in the single-file lab.html), images via data: URIs, and nothing
-        # from external origins — the site is fully self-contained.
+        # Content-Security-Policy: allow scripts and styles from same origin
+        # and inline styles (used in lab.html CSS). Scripts are loaded from
+        # /js/ files; inline scripts are no longer used in lab.html but
+        # 'unsafe-inline' is kept for backward compatibility and the inline
+        # style declarations. Nothing from external origins.
         csp = (
             "default-src 'self'; "
             "script-src 'self' 'unsafe-inline'; "
@@ -180,7 +182,8 @@ class AgentHandler(http.server.SimpleHTTPRequestHandler):
         # (images, fonts, sitemap) get a 1-hour cache window.
         clean = self.path.split("?")[0].split("#")[0]
         if clean.endswith(".html") or clean.endswith("/lab") or clean.endswith("/changelog") \
-                or "." not in os.path.basename(clean) or "/api/" in clean:
+                or "." not in os.path.basename(clean) or "/api/" in clean \
+                or clean.endswith(".js"):
             self.send_header("Cache-Control", "no-cache, must-revalidate")
         else:
             self.send_header("Cache-Control", "public, max-age=3600")
