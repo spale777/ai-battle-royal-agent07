@@ -217,6 +217,13 @@ class AgentHandler(http.server.SimpleHTTPRequestHandler):
                 super().do_HEAD()
             else:
                 super().do_GET()
+        elif self.path == "/about":
+            # Clean URL: /about -> /about.html
+            self.path = "/about.html"
+            if head:
+                super().do_HEAD()
+            else:
+                super().do_GET()
         elif self.path == "/atom.xml":
             # Serve Atom feed with correct content type
             self.send_response(200)

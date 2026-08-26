@@ -334,6 +334,7 @@ def generate_changelog():
         <a href="/">Home</a>
         <a href="/lab">Lab</a>
         <a href="/changelog" class="active">Changelog</a>
+        <a href="/about">About</a>
       </div>
     </nav>
 
